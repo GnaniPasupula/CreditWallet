@@ -28,7 +28,7 @@ router.post('/add', async (req, res) => {
     try {
       const savedCard = await newCreditCard.save();
       console.log('Credit card saved:', savedCard);
-      res.status(201).send(savedCard);
+      res.status(201).json(savedCard);
     } catch (err) {
       console.error('Error saving credit card:', err);
       res.status(500).send('Error saving credit card. Please try again.');
@@ -60,7 +60,7 @@ router.put('/update/:cardNumber', async (req, res) => {
       bankName,
     });
     console.log('Credit card updated:', updatedCard);
-    res.status(200).send(updatedCard);
+    res.status(200).json(updatedCard);
   } catch (err) {
     console.error('Error updating credit card:', err);
     res.status(500).send('Error updating credit card. Please try again.');
@@ -94,7 +94,7 @@ router.put('/addTransaction/:cardNumber', async (req, res) => {
     );
 
     console.log('Credit card updated:', updatedCard);
-    res.status(200).send(updatedCard);
+    res.status(200).json(updatedCard);
   } catch (err) {
     console.error('Error updating credit card:', err);
     res.status(500).send('Error updating credit card. Please try again.');
