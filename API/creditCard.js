@@ -36,5 +36,74 @@ router.post('/add', async (req, res) => {
   
 });
 
+router.get('/get', async (req, res) => {
+  try{
+    const creditCards = await CreditCard.find({});
+    res.json(creditCards);
+  }catch(err){
+    console.error('Error getting credit cards:', err);
+    res.status(500).send('Error getting credit cards. Please try again.');
+  }
+});
+
+// update credit card with cardNumber
+router.put('/update/:cardNumber', async (req, res) => {
+  const { cardNumber } = req.params;
+  const { limit, outStanding, expiryDate, cardName, bankName } = req.body;
+
+  try {
+    const updatedCard = await CreditCard.findOneAndUpdate(cardNumber, {
+      limit,
+      outStanding,
+      expiryDate,
+      cardName,
+      bankName,
+    });
+    console.log('Credit card updated:', updatedCard);
+    res.status(200).send(updatedCard);
+  } catch (err) {
+    console.error('Error updating credit card:', err);
+    res.status(500).send('Error updating credit card. Please try again.');
+  }
+});
+
+// delete credit card with cardNumber
+router.delete('/delete/:cardNumber', async (req, res) => {
+  const { cardNumber } = req.params;
+
+  try {
+    const deletedCard = await CreditCard.findOneAndDelete(cardNumber);
+    console.log('Credit card deleted:', deletedCard);
+    res.status(200).send(deletedCard);
+  } catch (err) {
+    console.error('Error deleting credit card:', err);
+    res.status(500).send('Error deleting credit card. Please try again.');
+  }
+});
+
+// add transaction amount to already existing outstanding balance with cardNumber
+
+router.put('/addTransaction/:cardNumber', async (req, res) => {
+  const { cardNumber } = req.params;
+  const { transactionAmount } = req.body; 
+
+  try {
+    const updatedCard = await CreditCard.findOneAndUpdate(
+      { cardNumber }, 
+      { $inc: { outStanding: transactionAmount } } 
+    );
+
+    console.log('Credit card updated:', updatedCard);
+    res.status(200).send(updatedCard);
+  } catch (err) {
+    console.error('Error updating credit card:', err);
+    res.status(500).send('Error updating credit card. Please try again.');
+  }
+});
+
+
+
+
+
+
 module.exports = router;
-module.exports = CreditCard;

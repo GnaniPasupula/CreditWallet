@@ -3,7 +3,6 @@ const session = require('express-session');
 const passport = require('passport');
 const authRouter = require('./auth');
 const creditCardRouter = require('./creditCard'); 
-const CreditCard = require('./creditCard');
 const mongoose = require('mongoose');
 const { ensureAuthenticated } = require('./Middleware/authMiddleware'); 
 const cors = require('cors'); 
@@ -37,21 +36,10 @@ function startServer() {
 
   app.get('/', (req, res) => {
     if(req.isAuthenticated()){
-      res.redirect('/dashboard');
+      res.redirect('/creditCard/get');
     }else{
       res.send('<a href="/auth/google">Authenticate with Google</a>');
     }
-  });
-
-  app.get('/dashboard', ensureAuthenticated,async(req, res) => {
-    try{
-      const creditCards = await CreditCard.find({});
-      res.json(creditCards);
-    }catch(err){
-      console.error('Error getting credit cards:', err);
-      res.status(500).send('Error getting credit cards. Please try again.');
-    }
-    
   });
 
   const PORT = process.env.PORT || 3000;
