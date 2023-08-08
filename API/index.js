@@ -1,10 +1,8 @@
+require("dotenv").config()
 const express = require('express');
 const session = require('express-session');
-const passport = require('passport');
-const authRouter = require('./auth');
 const creditCardRouter = require('./creditCard'); 
 const mongoose = require('mongoose');
-const { ensureAuthenticated } = require('./Middleware/authMiddleware'); 
 const cors = require('cors'); 
 
 mongoose.connect(process.env.MONGO_URI, {
@@ -28,18 +26,11 @@ function startServer() {
   }));
 
   app.use(cors())
-  app.use(passport.initialize());
-  app.use(passport.session());
 
-  app.use('/auth', authRouter);
   app.use('/creditCard', creditCardRouter); 
 
   app.get('/', (req, res) => {
-    if(req.isAuthenticated()){
-      res.redirect('/creditCard/get');
-    }else{
-      res.send('<a href="/auth/google">Authenticate with Google</a>');
-    }
+    res.redirect('/creditCard/get');
   });
 
   const PORT = process.env.PORT || 3000;
