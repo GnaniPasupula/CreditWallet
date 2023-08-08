@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:dotted_border/dotted_border.dart';  
 import 'api_helper.dart';
 import 'credit_card_data.dart';
 import 'credit_card_form.dart'; 
@@ -40,42 +39,94 @@ class _CreditCardScreenState extends State<CreditCardScreen> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-         Padding(
+        Padding(
             padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: DottedBorder(
-              color: Colors.black,
-              strokeWidth: 1.5,
-              borderType: BorderType.RRect,
-              radius: Radius.circular(16),
-              dashPattern: [5, 5],
-              child: ElevatedButton(
-                onPressed: () {
-                  showModalBottomSheet<void>(
-                    context: context,
-                    isScrollControlled: true,
-                    builder: (BuildContext context) {
-                      return CreditCardForm(); // Show the credit card form as a bottom sheet
+            child: Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      showModalBottomSheet<void>(
+                        context: context,
+                        isScrollControlled: true,
+                        builder: (BuildContext context) {
+                          return CreditCardForm(); // Show the credit card form as a bottom sheet
+                        },
+                      );
                     },
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  primary: Colors.white,
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                ),
-                child:Center(
-                  child: Text(
-                    '+',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.w300, 
-                      color: Colors.black
+                    style: ElevatedButton.styleFrom(
+                      primary: Colors.white,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        side: BorderSide(color: Colors.black, width: 1.5),
+                      ),
+                    ),
+                    child: Center(
+                      child: Text(
+                        '+',
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.w300,
+                          color: Colors.black,
+                        ),
+                      ),
                     ),
                   ),
-                ),                            
-              ),
+                ),
+                SizedBox(width: 8), // Add spacing between buttons
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      // Add your edit button functionality here
+                    },
+                    style: ElevatedButton.styleFrom(
+                      primary: Colors.white,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        side: BorderSide(color: Colors.black, width: 1.5),
+                      ),
+                    ),
+                    child: Center(
+                      child: Text(
+                        'Edit',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w300,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(width: 8), // Add spacing between buttons
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      // Add your delete button functionality here
+                    },
+                    style: ElevatedButton.styleFrom(
+                      primary: Colors.white,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        side: BorderSide(color: Colors.black, width: 1.5),
+                      ),
+                    ),
+                    child: Center(
+                      child: Text(
+                        'Delete',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w300,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
 
