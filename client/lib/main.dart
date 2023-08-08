@@ -90,32 +90,6 @@ class _CreditCardScreenState extends State<CreditCardScreen> {
                 Expanded(
                   child: ElevatedButton(
                     onPressed: () {
-                      // Add your edit button functionality here
-                    },
-                    style: ElevatedButton.styleFrom(
-                      primary: Colors.white,
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                        side: BorderSide(color: Colors.black, width: 1.5),
-                      ),
-                    ),
-                    child: Center(
-                      child: Text(
-                        'Edit',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w300,
-                          color: Colors.black,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                SizedBox(width: 8), // Add spacing between buttons
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () {
                       // Add your delete button functionality here
                     },
                     style: ElevatedButton.styleFrom(
