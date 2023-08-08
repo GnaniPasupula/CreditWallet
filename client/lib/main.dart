@@ -1,5 +1,4 @@
-import 'dart:math';
-
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'api_helper.dart';
 import 'credit_card_data.dart';
@@ -39,8 +38,7 @@ class _CreditCardScreenState extends State<CreditCardScreen> {
       print(e);
       // Handle error and show a proper error message to the user
     }
-  }
-
+  } 
 
   @override
   Widget build(BuildContext context) {
@@ -89,8 +87,15 @@ class _CreditCardScreenState extends State<CreditCardScreen> {
                 SizedBox(width: 8), // Add spacing between buttons
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: () {
+                    onPressed: () async {
                       // Add your delete button functionality here
+                      final deletedCard = await ApiHelper.deleteCreditCard(creditCards[currentIndex].cardNumber);
+                      if (deletedCard != null) {
+                        setState(() {
+                          creditCards.removeAt(currentIndex);
+                        });
+                      }
+
                     },
                     style: ElevatedButton.styleFrom(
                       primary: Colors.white,

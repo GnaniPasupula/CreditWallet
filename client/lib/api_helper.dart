@@ -26,4 +26,22 @@ class ApiHelper {
       throw Exception('Error fetching credit card data: $e');
     }
   }
+
+  static Future<CreditCardData?> deleteCreditCard(String cardNumber) async {
+  final url = '$baseUrl/creditCard/delete/$cardNumber';
+
+  try {
+    final response = await http.delete(Uri.parse(url));
+
+    if (response.statusCode == 200) {
+      final dynamic jsonData = json.decode(response.body);
+      return CreditCardData.fromJson(jsonData);
+    } else {
+      throw Exception('Failed to delete credit card');
+    }
+  } catch (e) {
+    throw Exception('Error deleting credit card: $e');
+  }
+}
+
 }
