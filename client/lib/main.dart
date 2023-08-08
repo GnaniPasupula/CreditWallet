@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'api_helper.dart';
 import 'credit_card_data.dart';
@@ -10,11 +12,21 @@ class CreditCardScreen extends StatefulWidget {
 
 class _CreditCardScreenState extends State<CreditCardScreen> {
   List<CreditCardData> creditCards = [];
+  late PageController _pageController;
+  int currentIndex = 0;
 
   @override
   void initState() {
     super.initState();
+    _pageController = PageController(initialPage: currentIndex);
     _fetchCreditCardData();
+  }
+
+   void onPageChanged(int newIndex) {
+    setState(() {
+      currentIndex = newIndex;
+      print('current index is $currentIndex');
+    });
   }
 
   Future<void> _fetchCreditCardData() async {
@@ -138,6 +150,7 @@ class _CreditCardScreenState extends State<CreditCardScreen> {
                 child: PageView.builder(
                   scrollDirection: Axis.horizontal,
                   itemCount: creditCards.length,
+                  onPageChanged: onPageChanged,
                   itemBuilder: (context, index) {
                     final card = creditCards[index];
                     return Padding(
