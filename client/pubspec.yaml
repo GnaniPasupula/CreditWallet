@@ -7,9 +7,13 @@ environment:
   sdk: '>=3.0.6 <4.0.0'
 
 dependencies:
+  firebase_auth: ^4.7.2
   flutter:
     sdk: flutter
+  google_sign_in: ^6.1.4
   http: ^0.13.3
+  flutter_dotenv: ^5.0.2
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
