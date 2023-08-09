@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'auth_screen.dart';
+import 'credit_card_screen.dart'; 
 
 void main() {
   runApp(MaterialApp(
-    home: SignInScreen(),
+    home: CreditCardScreen(),
   ));
 }
