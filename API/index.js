@@ -1,9 +1,11 @@
-require("dotenv").config()
+require('dotenv').config();
 const express = require('express');
 const session = require('express-session');
-const creditCardRouter = require('./creditCard'); 
 const mongoose = require('mongoose');
-const cors = require('cors'); 
+const cors = require('cors');
+const authRouter = require('./routes/auth');
+const creditCardRouter = require('./routes/creditCard');
+const { authenticateUser } = require('./Middleware/authMiddleware'); 
 
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
@@ -20,14 +22,15 @@ function startServer() {
 
   app.use(express.json());
   app.use(session({
-    secret: 'cats', 
+    secret: 'cats',
     resave: false,
-    saveUninitialized: true
+    saveUninitialized: true,
   }));
 
-  app.use(cors())
+  app.use(cors());
 
-  app.use('/creditCard', creditCardRouter); 
+  app.use('/auth', authRouter);
+  app.use('/creditCard', authenticateUser, creditCardRouter); 
 
   app.get('/', (req, res) => {
     res.redirect('/creditCard/get');
@@ -38,5 +41,4 @@ function startServer() {
   app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
   });
-
 }

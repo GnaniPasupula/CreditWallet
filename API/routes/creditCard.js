@@ -9,42 +9,48 @@ const creditCardSchema = new mongoose.Schema({
   expiryDate: { type: String, required: true },
   cardName: { type: String, required: true },
   bankName: { type: String, required: true },
+  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
 });
 
 const CreditCard = mongoose.model('CreditCard', creditCardSchema);
 
 router.post('/add', async (req, res) => {
-  const { cardNumber, limit, outStanding,expiryDate, cardName, bankName } = req.body;
-
-    const newCreditCard = new CreditCard({
-      cardNumber,
-      limit,
-      outStanding,
-      expiryDate,
-      cardName,
-      bankName,
-    });
+  const { cardNumber, limit, outStanding, expiryDate, cardName, bankName } = req.body;
   
-    try {
-      const savedCard = await newCreditCard.save();
-      console.log('Credit card saved:', savedCard);
-      res.status(201).json(savedCard);
-    } catch (err) {
-      console.error('Error saving credit card:', err);
-      res.status(500).send('Error saving credit card. Please try again.');
-    }
+  const userId = req.session.user._id; 
   
+  const newCreditCard = new CreditCard({
+    cardNumber,
+    limit,
+    outStanding,
+    expiryDate,
+    cardName,
+    bankName,
+    user: userId, // Link the user to the credit card
+  });
+  
+  try {
+    const savedCard = await newCreditCard.save();
+    console.log('Credit card saved:', savedCard);
+    res.status(201).json(savedCard);
+  } catch (err) {
+    console.error('Error saving credit card:', err);
+    res.status(500).send('Error saving credit card. Please try again.');
+  }
 });
 
 router.get('/get', async (req, res) => {
-  try{
-    const creditCards = await CreditCard.find({});
+  const userId = req.session.user._id; 
+
+  try {
+    const creditCards = await CreditCard.find({ user: userId });
     res.json(creditCards);
-  }catch(err){
+  } catch (err) {
     console.error('Error getting credit cards:', err);
     res.status(500).send('Error getting credit cards. Please try again.');
   }
 });
+
 
 // update credit card with cardNumber
 router.put('/update/:cardNumber', async (req, res) => {
