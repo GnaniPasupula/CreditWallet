@@ -1,24 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const mongoose = require('mongoose');
-
-const creditCardSchema = new mongoose.Schema({
-  cardNumber: { type: String, required: true },
-  limit: { type: Number, required: true },
-  outStanding: { type: Number, required: true },
-  expiryDate: { type: String, required: true },
-  cardName: { type: String, required: true },
-  bankName: { type: String, required: true },
-  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-  transactions: [
-    {
-      date: { type: Date, default: Date.now },
-      amount: { type: Number, required: true },
-    },
-  ],
-});
-
-const CreditCard = mongoose.model('CreditCard', creditCardSchema);
+const CreditCard = require('../Models/creditCard'); // Import the CreditCard schema
 
 router.post('/add', async (req, res) => {
   const { cardNumber, limit, outStanding, expiryDate, cardName, bankName } = req.body;
