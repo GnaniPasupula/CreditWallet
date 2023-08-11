@@ -52,19 +52,24 @@ router.get('/get', async (req, res) => {
 });
 
 
-// update credit card with cardNumber
+// Update credit card with cardNumber
 router.put('/update/:cardNumber', async (req, res) => {
   const { cardNumber } = req.params;
   const { limit, outStanding, expiryDate, cardName, bankName } = req.body;
+  const userId = req.session.user._id; // Assuming user ID is stored in the session
 
   try {
-    const updatedCard = await CreditCard.findOneAndUpdate(cardNumber, {
-      limit,
-      outStanding,
-      expiryDate,
-      cardName,
-      bankName,
-    });
+    const updatedCard = await CreditCard.findOneAndUpdate(
+      { cardNumber, user: userId }, // Use both cardNumber and userId to find the document
+      {
+        limit,
+        outStanding,
+        expiryDate,
+        cardName,
+        bankName,
+      },
+      { new: true } // Return the updated document
+    );
     console.log('Credit card updated:', updatedCard);
     res.status(200).json(updatedCard);
   } catch (err) {
@@ -73,12 +78,16 @@ router.put('/update/:cardNumber', async (req, res) => {
   }
 });
 
-// delete credit card with cardNumber
+// Delete credit card with cardNumber
 router.delete('/delete/:cardNumber', async (req, res) => {
   const { cardNumber } = req.params;
+  const userId = req.session.user._id; // Assuming user ID is stored in the session
 
   try {
-    const deletedCard = await CreditCard.findOneAndDelete(cardNumber);
+    const deletedCard = await CreditCard.findOneAndDelete({
+      cardNumber,
+      user: userId,
+    }); // Use both cardNumber and userId to find the document
     console.log('Credit card deleted:', deletedCard);
     res.status(200).send(deletedCard);
   } catch (err) {
@@ -87,16 +96,17 @@ router.delete('/delete/:cardNumber', async (req, res) => {
   }
 });
 
-// add transaction amount to already existing outstanding balance with cardNumber
-
+// Add transaction amount to already existing outstanding balance with cardNumber
 router.put('/addTransaction/:cardNumber', async (req, res) => {
   const { cardNumber } = req.params;
-  const { transactionAmount } = req.body; 
+  const { transactionAmount } = req.body;
+  const userId = req.session.user._id; // Assuming user ID is stored in the session
 
   try {
     const updatedCard = await CreditCard.findOneAndUpdate(
-      { cardNumber }, 
-      { $inc: { outStanding: transactionAmount } } 
+      { cardNumber, user: userId }, // Use both cardNumber and userId to find the document
+      { $inc: { outStanding: transactionAmount } },
+      { new: true } // Return the updated document
     );
 
     console.log('Credit card updated:', updatedCard);
@@ -106,9 +116,6 @@ router.put('/addTransaction/:cardNumber', async (req, res) => {
     res.status(500).send('Error updating credit card. Please try again.');
   }
 });
-
-
-
 
 
 
