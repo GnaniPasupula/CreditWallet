@@ -10,6 +10,12 @@ const creditCardSchema = new mongoose.Schema({
   cardName: { type: String, required: true },
   bankName: { type: String, required: true },
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  transactions: [
+    {
+      date: { type: Date, default: Date.now },
+      amount: { type: Number, required: true },
+    },
+  ],
 });
 
 const CreditCard = mongoose.model('CreditCard', creditCardSchema);
@@ -105,7 +111,7 @@ router.put('/addTransaction/:cardNumber', async (req, res) => {
   try {
     const updatedCard = await CreditCard.findOneAndUpdate(
       { cardNumber, user: userId }, // Use both cardNumber and userId to find the document
-      { $inc: { outStanding: transactionAmount } },
+      { $inc: { outStanding: transactionAmount }, $push: { transactions: { amount: transactionAmount } } },
       { new: true } // Return the updated document
     );
 
@@ -116,6 +122,25 @@ router.put('/addTransaction/:cardNumber', async (req, res) => {
     res.status(500).send('Error updating credit card. Please try again.');
   }
 });
+
+// Get all transactions of a specific credit card
+router.get('/transactions/:cardNumber', async (req, res) => {
+  const { cardNumber } = req.params;
+  const userId = req.session.user._id; // Assuming user ID is stored in the session
+
+  try {
+    const creditCard = await CreditCard.findOne({ cardNumber, user: userId });
+    if (!creditCard) {
+      return res.status(404).send('Credit card not found');
+    }
+
+    res.status(200).json(creditCard.transactions);
+  } catch (err) {
+    console.error('Error getting credit card transactions:', err);
+    res.status(500).send('Error getting credit card transactions. Please try again.');
+  }
+});
+
 
 
 
