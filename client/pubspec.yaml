@@ -9,7 +9,9 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_dotenv: ^5.1.0
   http: ^0.13.3
+  shared_preferences: ^2.2.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
