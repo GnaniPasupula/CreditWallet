@@ -1,12 +1,15 @@
 const express = require('express');
 const router = express.Router();
 const CreditCard = require('../Models/creditCard'); // Import the CreditCard schema
+const jwt = require('jsonwebtoken');
 
+// Add credit card
 router.post('/add', async (req, res) => {
   const { cardNumber, limit, outStanding, expiryDate, cardName, bankName } = req.body;
-  
-  const userId = req.session.user._id; 
-  
+
+  const userId = req.user.userId; // Extracted from the JWT token
+
+  // Create a new credit card document
   const newCreditCard = new CreditCard({
     cardNumber,
     limit,
@@ -14,9 +17,9 @@ router.post('/add', async (req, res) => {
     expiryDate,
     cardName,
     bankName,
-    user: userId, // Link the user to the credit card
+    user: userId,
   });
-  
+
   try {
     const savedCard = await newCreditCard.save();
     console.log('Credit card saved:', savedCard);
@@ -27,9 +30,10 @@ router.post('/add', async (req, res) => {
   }
 });
 
+// Get credit cards
 router.get('/get', async (req, res) => {
-  const userId = req.session.user._id; 
-
+  const userId = req.user.userId; // Extracted from the JWT token
+  console.log(userId+" userId");
   try {
     const creditCards = await CreditCard.find({ user: userId });
     res.json(creditCards);
@@ -44,7 +48,7 @@ router.get('/get', async (req, res) => {
 router.put('/update/:cardNumber', async (req, res) => {
   const { cardNumber } = req.params;
   const { limit, outStanding, expiryDate, cardName, bankName } = req.body;
-  const userId = req.session.user._id; // Assuming user ID is stored in the session
+  const userId = req.user.userId; // Extracted from the JWT token
 
   try {
     const updatedCard = await CreditCard.findOneAndUpdate(
@@ -69,7 +73,7 @@ router.put('/update/:cardNumber', async (req, res) => {
 // Delete credit card with cardNumber
 router.delete('/delete/:cardNumber', async (req, res) => {
   const { cardNumber } = req.params;
-  const userId = req.session.user._id; // Assuming user ID is stored in the session
+  const userId = req.user.userId; // Extracted from the JWT token
 
   try {
     const deletedCard = await CreditCard.findOneAndDelete({
@@ -88,7 +92,7 @@ router.delete('/delete/:cardNumber', async (req, res) => {
 router.put('/addTransaction/:cardNumber', async (req, res) => {
   const { cardNumber } = req.params;
   const { transactionAmount } = req.body;
-  const userId = req.session.user._id; // Assuming user ID is stored in the session
+  const userId = req.user.userId; // Extracted from the JWT token
 
   try {
     const updatedCard = await CreditCard.findOneAndUpdate(
@@ -108,7 +112,7 @@ router.put('/addTransaction/:cardNumber', async (req, res) => {
 // Get all transactions of a specific credit card
 router.get('/transactions/:cardNumber', async (req, res) => {
   const { cardNumber } = req.params;
-  const userId = req.session.user._id; // Assuming user ID is stored in the session
+  const userId = req.user.userId; // Extracted from the JWT token
 
   try {
     const creditCard = await CreditCard.findOne({ cardNumber, user: userId });
@@ -122,8 +126,6 @@ router.get('/transactions/:cardNumber', async (req, res) => {
     res.status(500).send('Error getting credit card transactions. Please try again.');
   }
 });
-
-
 
 
 module.exports = router;

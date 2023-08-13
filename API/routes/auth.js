@@ -28,32 +28,31 @@ router.post('/signin', async (req, res) => {
       const { email, password } = req.body;
     
       const user = await User.findOne({ email });
-    //   console.log('User from database:', user);
   
       if (!user) {
         return res.status(401).json({ message: 'User doesn\'t exist' });
       }
-  
-    //   console.log('Provided password:', password);
-    //   console.log('Stored hashed password:', user.password);
-  
+
       const isPasswordValid = await bcrypt.compare(password, user.password);
-    //   console.log('Password comparison result:', isPasswordValid);
   
       if (!isPasswordValid) {
         return res.status(401).json({ message: 'Invalid email or password' });
       }
 
-      const authToken = jwt.sign({ userId: user._id }, 'your-secret-key');
+      const payLoad={
+        userId:user._id
+      }
+
+      const authToken = jwt.sign(payLoad, process.env.SECRET_KEY);
+
+      console.log(authToken);
   
-      // req.session.user = user;
       res.status(200).json({ message: 'Signin successful', token: authToken });
+
     } catch (error) {
       console.error('Error:', error);
       res.status(500).json({ message: 'An error occurred' });
     }
 });
   
-  
-
 module.exports = router;
