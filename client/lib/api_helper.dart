@@ -7,7 +7,6 @@ import 'dart:convert';
 import 'credit_card_data.dart';
 
 class ApiHelper {
-  //static const baseUrl = 'http://192.168.1.8:3000';
   static const baseUrl = 'http://localhost:3000';
 
   static Future<List<CreditCardData>> fetchCreditCardData() async {
@@ -16,6 +15,8 @@ class ApiHelper {
     try {
       final prefs = await SharedPreferences.getInstance();
       final authToken = prefs.getString('authToken');
+      // print("authToken from get");
+      // print(authToken);
 
       final response = await http.get(
         Uri.parse(url),
@@ -49,6 +50,49 @@ class ApiHelper {
       }
     } catch (e) {
       throw Exception('Error deleting credit card: $e');
+    }
+  }
+
+  static Future<CreditCardData?> addCreditCard(
+    String cardNumber,
+    double limit,
+    double outStanding,
+    String expiryDate,
+    String cardName,
+    String bankName,
+  ) async {
+    final url = '$baseUrl/creditCard/add';
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final authToken = prefs.getString('authToken');
+      // print("authToken from add");
+      // print(authToken);
+
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {
+          'Authorization': 'Bearer $authToken',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'cardNumber': cardNumber,
+          'limit': limit,
+          'outStanding': outStanding,
+          'expiryDate': expiryDate,
+          'cardName': cardName,
+          'bankName': bankName,
+        }),
+      );
+
+      if (response.statusCode == 201) {
+        final dynamic jsonData = json.decode(response.body);
+        return CreditCardData.fromJson(jsonData);
+      } else {
+        throw Exception('Failed to add credit card');
+      }
+    } catch (e) {
+      throw Exception('Error adding credit card: $e');
     }
   }
 
