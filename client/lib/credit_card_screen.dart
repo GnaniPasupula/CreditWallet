@@ -346,14 +346,23 @@ class _CreditCardScreenState extends State<CreditCardScreen> {
                                 ),
                               ),
                             ),
-                            onDismissed: (direction) {
-                              // Handle the delete action here
-                              // Remove the transaction from the list or database
-                              setState(() {
-                                creditCards[currentIndex].transactions.removeAt(transactionIndex);
-                              });
-                            },
+                            onDismissed: (direction) async {
+                              final transaction = creditCards[currentIndex].transactions[transactionIndex];
+                              try {
+                                // Delete the transaction from the API
+                                await ApiHelper.deleteCreditCardTransaction(
+                                  creditCards[currentIndex].cardNumber, // Pass the cardNumber
+                                  transaction.date.toIso8601String(), // Assuming the date is a DateTime object
+                                );
 
+                                // Update the local list of transactions
+                                setState(() {
+                                  creditCards[currentIndex].transactions.removeAt(transactionIndex);
+                                });
+                              } catch (e) {
+                                print('Error deleting transaction: $e');
+                              }
+                            },
                       child:Card(
                         elevation: 4,
                         shape: RoundedRectangleBorder(

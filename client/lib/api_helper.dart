@@ -46,7 +46,10 @@ static Future<CreditCardData?> deleteCreditCard(String cardNumber) async {
 
     final response = await http.delete(
       Uri.parse(url),
-      headers: {'Authorization': 'Bearer $authToken'},
+      headers: {
+          'Authorization': 'Bearer $authToken',
+          'Content-Type': 'application/json',
+        },
     );
 
     if (response.statusCode == 200) {
@@ -141,6 +144,32 @@ static Future<CreditCardData?> addCreditCard(
       throw Exception('api_helper:Error adding transaction: $e');
     }
   }
+
+  static Future<void> deleteCreditCardTransaction(String cardNumber, String transactionDate) async {
+    final url = '$baseUrl/creditCard/transactions/$cardNumber/$transactionDate';
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final authToken = prefs.getString('authToken');
+
+      final response = await http.delete(
+        Uri.parse(url),
+        headers: {
+          'Authorization': 'Bearer $authToken',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        // Transaction deleted successfully
+      } else {
+        throw Exception('Failed to delete transaction');
+      }
+    } catch (e) {
+      throw Exception('Error deleting transaction: $e');
+    }
+  }
+
 
 
 }

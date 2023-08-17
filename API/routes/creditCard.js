@@ -96,12 +96,6 @@ router.put('/addTransaction/:cardNumber', async (req, res) => {
   const { transactionAmount,transactionTitle,transactionCategory,transactionDate } = req.body;
   const userId = req.user.userId; // Extracted from the JWT token
 
-  // console.log("transactionAmount:", transactionAmount);
-  // console.log("transactionTitle:", transactionTitle);
-  // console.log("transactionCategory:", transactionCategory);
-  // console.log("transactionDate:", transactionDate);
-  // console.log('Req Body:', req.body);
-
   try {
     const updatedCard = await CreditCard.findOneAndUpdate(
       { cardNumber, user: userId },
@@ -125,6 +119,27 @@ router.put('/addTransaction/:cardNumber', async (req, res) => {
   }
 });
 
+// Delete a transaction from a credit card
+router.delete('/transactions/:cardNumber/:transactionDate', async (req, res) => {
+  const { cardNumber, transactionDate } = req.params;
+  const userId = req.user.userId;
+
+  try {
+    const updatedCard = await CreditCard.findOneAndUpdate(
+      { cardNumber, user: userId },
+      { $pull: { transactions: { date: transactionDate } } },
+      { new: true }
+    );
+
+    console.log('Credit card updated:', updatedCard);
+    res.status(200).json(updatedCard);
+  } catch (err) {
+    console.error('Error updating credit card:', err);
+    res.status(500).send('Error updating credit card. Please try again.');
+  }
+});
+
+
 // Get all transactions of a specific credit card
 router.get('/transactions/:cardNumber', async (req, res) => {
   const { cardNumber } = req.params;
@@ -142,6 +157,7 @@ router.get('/transactions/:cardNumber', async (req, res) => {
     res.status(500).send('Error getting credit card transactions. Please try again.');
   }
 });
+
 
 
 module.exports = router;
