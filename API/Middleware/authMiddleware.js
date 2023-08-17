@@ -3,12 +3,12 @@ const jwt = require('jsonwebtoken');
 
 function authenticateUser(req, res, next) {
   const token = req.headers.authorization && req.headers.authorization.split(' ')[1]; // Get token from the "Authorization" header
-  console.log("token from middleware "+token);
+  // console.log("token from middleware "+token);
 
   if (token) {
     try {
       const decodedToken = jwt.verify(token, process.env.SECRET_KEY);
-      console.log("Decoded token:", decodedToken);
+      // console.log("Decoded token:", decodedToken);
       req.user = decodedToken;
       next();
     } catch (error) {

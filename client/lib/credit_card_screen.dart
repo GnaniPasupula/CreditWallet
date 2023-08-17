@@ -1,3 +1,4 @@
+import 'package:client/spend_dialog.dart';
 import 'package:flutter/material.dart';
 import 'api_helper.dart';
 import 'credit_card_data.dart';
@@ -13,6 +14,7 @@ class _CreditCardScreenState extends State<CreditCardScreen> {
   List<CreditCardData> creditCards = [];
   late PageController _pageController;
   int currentIndex = 0;
+  bool _isSpendDialogVisible = false;
 
   @override
   void initState() {
@@ -43,8 +45,27 @@ class _CreditCardScreenState extends State<CreditCardScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.black,
       appBar: AppBar(
-        title: Text('Credit Card Data'),
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Dashboard',
+              style: TextStyle(fontWeight: FontWeight.normal),
+            ),
+          ],
+        ),
+        backgroundColor: Colors.black,
+        automaticallyImplyLeading: false,
+        actions: [
+          IconButton(
+            onPressed: () {
+              // Handle notification icon press
+            },
+            icon: Icon(Icons.notifications),
+          ),
+        ],
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -60,7 +81,14 @@ class _CreditCardScreenState extends State<CreditCardScreen> {
                         context: context,
                         isScrollControlled: true,
                         builder: (BuildContext context) {
-                          return CreditCardForm(); // Show the credit card form as a bottom sheet
+                          return CreditCardForm(
+                            onCardAdded: () {
+                              if(currentIndex<0){
+                                currentIndex++;
+                              }
+                              _fetchCreditCardData(); // Update the creditCards list
+                            },
+                          ); // Show the credit card form as a bottom sheet
                         },
                       );
                     },
@@ -73,13 +101,8 @@ class _CreditCardScreenState extends State<CreditCardScreen> {
                       ),
                     ),
                     child: Center(
-                      child: Text(
-                        '+',
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.w300,
-                          color: Colors.black,
-                        ),
+                      child: Icon(Icons.add,
+                      color: Colors.black,
                       ),
                     ),
                   ),
@@ -93,6 +116,9 @@ class _CreditCardScreenState extends State<CreditCardScreen> {
                       if (deletedCard != null) {
                         setState(() {
                           creditCards.removeAt(currentIndex);
+                          if (currentIndex == creditCards.length) {
+                            currentIndex--;
+                          }
                         });
                       }
 
@@ -106,13 +132,8 @@ class _CreditCardScreenState extends State<CreditCardScreen> {
                       ),
                     ),
                     child: Center(
-                      child: Text(
-                        'Delete',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w300,
-                          color: Colors.black,
-                        ),
+                      child: Icon(Icons.delete,
+                      color: Colors.black,
                       ),
                     ),
                   ),
@@ -125,24 +146,23 @@ class _CreditCardScreenState extends State<CreditCardScreen> {
             child: Align(
               alignment: Alignment.topCenter,
               child: SizedBox(
-                height: (MediaQuery.of(context).size.width * 0.63) - 16,
                 child: PageView.builder(
                   scrollDirection: Axis.horizontal,
                   itemCount: creditCards.length,
                   onPageChanged: onPageChanged,
                   itemBuilder: (context, index) {
                     final card = creditCards[index];
-                    String getCardType(String cardNumber) {
+                    Widget  getCardType(String cardNumber) {
                     if (cardNumber.startsWith('4')) {
-                      return 'VISA';
+                      return Image.asset('../web/icons/visa.png', width: 30, height: 30); 
                     } else if (cardNumber.startsWith('5')) {
-                      return 'MasterCard';
+                      return Image.asset('../web/icons/mastercard.png', width: 36, height: 36); 
                     } else if (cardNumber.startsWith('3')) {
-                      return 'AMERICANEXPRESS';
+                      return Image.asset('../web/icons/amex.png', width: 36, height: 36); 
                     } else if (cardNumber.startsWith('6')) {
-                      return 'RuPay';
+                      return Image.asset('../web/icons/rupay.png', width: 36, height: 36);
                     } else {
-                      return 'Unknown';
+                      return Image.asset('../web/icons/mastercard.png', width: 36, height: 36); 
                     }
                   }
                     return Padding(
@@ -152,12 +172,12 @@ class _CreditCardScreenState extends State<CreditCardScreen> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
                         ),
+                        color: Colors.blue,
                         child: Container(
                           padding: EdgeInsets.all(16),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              
                                 Row(
                                   children: [
                                     Column(
@@ -166,35 +186,46 @@ class _CreditCardScreenState extends State<CreditCardScreen> {
                                       children: [
                                         Text(
                                           card.bankName,
-                                          style: TextStyle(
+                                          style: const TextStyle(
                                             fontWeight: FontWeight.bold,
                                             fontSize: 16,
+                                            color: Colors.white,
                                           ),
                                         ),
                                         SizedBox(height: 8),
                                         Text(
                                           card.cardNumber,
-                                          style: TextStyle(fontSize: 14),
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 14
+                                          )                                              
                                         ),
                                       ],
                                     ),
                                     Spacer(),
-                                    Text(getCardType(card.cardNumber)),
+                                    // Text(
+                                    //   getCardType(card.cardNumber),
+                                    //   style: const TextStyle(
+                                    //     color: Colors.white,
+                                    //   ),
+                                    // ),
+                                    getCardType(card.cardNumber), // Display the card icon here
                                   ],
                                 ),                        
                               Spacer(), // Vertically center the following elements
-                              Text(
+                              const Text(
                                 'Spent',
                                 style: TextStyle(
                                   fontSize: 12,
-                                  color: Colors.grey,
+                                  color: Colors.white,
                                 ),
                               ),
                               Text(
                                 '\$${card.outStanding.toStringAsFixed(2)}',
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 32,
                                   fontWeight: FontWeight.bold,
+                                  color: Colors.white,
                                 ),
                               ),
                               Spacer(),
@@ -202,16 +233,20 @@ class _CreditCardScreenState extends State<CreditCardScreen> {
                                 children: [
                                   Text(
                                     card.cardName,
-                                    style: TextStyle(fontSize: 14),
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.white,
+                                    ),
                                   ),
-                                  Spacer(),
+                                  const Spacer(),
                                   Text(
-                                    'Balance:\$${card.limit-card.outStanding}'
+                                    'Balance:\$${card.limit-card.outStanding}',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                    ),
                                   )
                                 ],
-                              )
-                            
-                              
+                              )                       
                             ],
                           ),
                         ),
@@ -223,81 +258,157 @@ class _CreditCardScreenState extends State<CreditCardScreen> {
             ),
           ),
           Container(
-            height: MediaQuery.of(context).size.height - ((MediaQuery.of(context).size.width * 0.85)), // Adjust the height as needed
-            child: ListView.builder(
-              itemCount: creditCards.isNotEmpty ? creditCards[currentIndex].transactions.length : 0,
-              itemBuilder: (context, transactionIndex) {
-                final transaction = creditCards[currentIndex].transactions[transactionIndex];
-
-                final now = DateTime.now();
-                final transactionDate = transaction.date;
-                String formattedDate;
-
-                if (transactionDate.year == now.year &&
-                    transactionDate.month == now.month &&
-                    transactionDate.day == now.day) {
-                  // Show time in 12hr format if it's today
-                  formattedDate = DateFormat.jm().format(transactionDate);
-                } else if (transactionDate.year == now.year &&
-                    transactionDate.month == now.month &&
-                    transactionDate.day == now.day - 1) {
-                  // Show "Yesterday" if it's yesterday
-                  formattedDate = 'Yesterday';
-                } else {
-                  // Show date in the format "day Month"
-                  formattedDate = DateFormat('d MMM').format(transactionDate);
-                }
-
-                return Card(
-                  elevation: 4,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  margin: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                  child: ListTile(
-                    leading: CircleAvatar(
-                      // You can replace this with the actual picture data
-                      child: Icon(Icons.account_balance_wallet),
-                      radius: 16,
-                    ),
-                    title: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          transaction.title,
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
-                        ),
-                        Text(
-                          transaction.category,
-                          style: TextStyle(fontSize: 14, color: Colors.grey),
-                        ),
-                      ],
-                    ),
-                    trailing: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Text(
-                          '\$${transaction.amount.toStringAsFixed(2)}',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Text(
-                          formattedDate,
-                          style: TextStyle(fontSize: 12, color: Colors.grey),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              },
+            decoration: const BoxDecoration(
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(16), 
+                topRight: Radius.circular(16), 
+              ),
+              color: Colors.white,
             ),
-          ),       
+            height: MediaQuery.of(context).size.height - ((MediaQuery.of(context).size.width * 0.8)), // Adjust the height as needed
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          'All Transactions', // Transaction text at top left
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 18,
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () async {
+                          // Show the SpendDetailsDialog and wait for the result
+                          showModalBottomSheet<void>(
+                            context: context,
+                            isScrollControlled: true,
+                            builder: (BuildContext context) {
+                              return SpendDetailsDialog(
+                                onSave: (transaction) {
+                                  setState(() {
+                                    creditCards[currentIndex].transactions.add(transaction);
+                                  });
+                                },
+                                creditCards: creditCards,
+                                currentIndex: currentIndex, // Pass the creditCards list
+                              );
+                            },
+                          );
+                        },
+                        icon: Icon(Icons.add_circle), // Circular "+" button
+                        color: Colors.yellow,
+                        iconSize: 30,
+                      ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: creditCards.isNotEmpty ? creditCards[currentIndex].transactions.length : 0,
+                    itemBuilder: (context, transactionIndex) {
+                      final transaction = creditCards[currentIndex].transactions[transactionIndex];
+
+                      final now = DateTime.now();
+                      final transactionDate = transaction.date;
+                      String formattedDate;
+
+                      if (transactionDate.year == now.year &&
+                          transactionDate.month == now.month &&
+                          transactionDate.day == now.day) {
+                        // Show time in 12hr format if it's today
+                        formattedDate = DateFormat.jm().format(transactionDate);
+                      } else if (transactionDate.year == now.year &&
+                          transactionDate.month == now.month &&
+                          transactionDate.day == now.day - 1) {
+                        // Show "Yesterday" if it's yesterday
+                        formattedDate = 'Yesterday';
+                      } else {
+                        // Show date in the format "day Month"
+                        formattedDate = DateFormat('d MMM').format(transactionDate);
+                      }
+                        return Dismissible(
+                            key: Key(transaction.date.toString()), // Use a unique identifier for each transaction
+                            direction: DismissDirection.endToStart,
+                            background: Container(
+                              alignment: AlignmentDirectional.centerEnd,
+                              color: Colors.red,
+                              child: Padding(
+                                padding: EdgeInsets.only(right: 16.0),
+                                child: Icon(
+                                  Icons.delete,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                            onDismissed: (direction) {
+                              // Handle the delete action here
+                              // Remove the transaction from the list or database
+                              setState(() {
+                                creditCards[currentIndex].transactions.removeAt(transactionIndex);
+                              });
+                            },
+
+                      child:Card(
+                        elevation: 4,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        margin: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                        child: ListTile(
+                          leading: CircleAvatar(
+                            // You can replace this with the actual picture data
+                            child: Icon(Icons.account_balance_wallet),
+                            radius: 16,
+                          ),
+                          title: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                transaction.title,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                              ),
+                              Text(
+                                transaction.category,
+                                style: TextStyle(fontSize: 14, color: Colors.grey),
+                              ),
+                            ],
+                          ),
+                          trailing: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Text(
+                                '\$${transaction.amount.toStringAsFixed(2)}',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Text(
+                                formattedDate,
+                                style: TextStyle(fontSize: 12, color: Colors.grey),
+                              ),
+                            ],
+                          ),
+                        ),
+                      )
+                        );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+
         ],
       ),
     );

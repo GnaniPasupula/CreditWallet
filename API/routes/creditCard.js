@@ -1,8 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const CreditCard = require('../Models/creditCard'); // Import the CreditCard schema
-const jwt = require('jsonwebtoken');
+const bodyParser = require('body-parser'); // Import body-parser
+const app = express();
 
+app.use(bodyParser.json());
 // Add credit card
 router.post('/add', async (req, res) => {
   const { cardNumber, limit, outStanding, expiryDate, cardName, bankName } = req.body;
@@ -33,7 +35,7 @@ router.post('/add', async (req, res) => {
 // Get credit cards
 router.get('/get', async (req, res) => {
   const userId = req.user.userId; // Extracted from the JWT token
-  console.log(userId+" userId");
+  // console.log(userId+" userId");
   try {
     const creditCards = await CreditCard.find({ user: userId });
     res.json(creditCards);
@@ -91,19 +93,33 @@ router.delete('/delete/:cardNumber', async (req, res) => {
 // Add transaction amount to already existing outstanding balance with cardNumber
 router.put('/addTransaction/:cardNumber', async (req, res) => {
   const { cardNumber } = req.params;
-  const { transactionAmount } = req.body;
+  const { transactionAmount,transactionTitle,transactionCategory,transactionDate } = req.body;
   const userId = req.user.userId; // Extracted from the JWT token
+
+  // console.log("transactionAmount:", transactionAmount);
+  // console.log("transactionTitle:", transactionTitle);
+  // console.log("transactionCategory:", transactionCategory);
+  // console.log("transactionDate:", transactionDate);
+  // console.log('Req Body:', req.body);
 
   try {
     const updatedCard = await CreditCard.findOneAndUpdate(
-      { cardNumber, user: userId }, // Use both cardNumber and userId to find the document
-      { $inc: { outStanding: transactionAmount }, $push: { transactions: { amount: transactionAmount } } },
-      { new: true } // Return the updated document
+      { cardNumber, user: userId },
+      {
+        $inc: { outStanding: transactionAmount  },
+        $push: { transactions: { amount:transactionAmount,title:transactionTitle,category:transactionCategory,date:transactionDate } }, // Include all transaction details
+      },
+      { new: true }
     );
 
     console.log('Credit card updated:', updatedCard);
-    res.status(200).json(updatedCard);
-  } catch (err) {
+    res.status(201).json({
+      transactionDate: transactionDate,
+      transactionAmount: transactionAmount,
+      transactionTitle: transactionTitle,
+      transactionCategory: transactionCategory,
+    });
+    } catch (err) {
     console.error('Error updating credit card:', err);
     res.status(500).send('Error updating credit card. Please try again.');
   }

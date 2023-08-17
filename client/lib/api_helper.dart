@@ -1,4 +1,4 @@
-import 'dart:math';
+import 'dart:html';
 
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -8,7 +8,8 @@ import 'credit_card_data.dart';
 
 class ApiHelper {
   static const baseUrl = 'http://localhost:3000';
-
+  //static const baseUrl = 'http://192.168.1.8:3000';
+  
   static Future<List<CreditCardData>> fetchCreditCardData() async {
     final url = '$baseUrl/creditCard/get';
 
@@ -36,24 +37,30 @@ class ApiHelper {
     }
   }
 
-  static Future<CreditCardData?> deleteCreditCard(String cardNumber) async {
-    final url = '$baseUrl/creditCard/delete/$cardNumber';
+static Future<CreditCardData?> deleteCreditCard(String cardNumber) async {
+  final url = '$baseUrl/creditCard/delete/$cardNumber';
 
-    try {
-      final response = await http.delete(Uri.parse(url));
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    final authToken = prefs.getString('authToken');
 
-      if (response.statusCode == 200) {
-        final dynamic jsonData = json.decode(response.body);
-        return CreditCardData.fromJson(jsonData);
-      } else {
-        throw Exception('Failed to delete credit card');
-      }
-    } catch (e) {
-      throw Exception('Error deleting credit card: $e');
+    final response = await http.delete(
+      Uri.parse(url),
+      headers: {'Authorization': 'Bearer $authToken'},
+    );
+
+    if (response.statusCode == 200) {
+      final dynamic jsonData = json.decode(response.body);
+      return CreditCardData.fromJson(jsonData);
+    } else {
+      throw Exception('Failed to delete credit card');
     }
+  } catch (e) {
+    throw Exception('Error deleting credit card: $e');
   }
+}
 
-  static Future<CreditCardData?> addCreditCard(
+static Future<CreditCardData?> addCreditCard(
     String cardNumber,
     double limit,
     double outStanding,
@@ -95,5 +102,45 @@ class ApiHelper {
       throw Exception('Error adding credit card: $e');
     }
   }
+
+  static Future<Transaction?> addTransactionToCard(String cardNumber, Map<String, dynamic> transactionData) async {
+    final url = '$baseUrl/creditCard/addTransaction/$cardNumber';
+
+    // print('cardNumber: ${cardNumber}');
+    // print('transactionData: ${transactionData}');
+
+    final ftransactionData = {
+      'transactionAmount': transactionData['transactionAmount'],  
+      'transactionTitle': transactionData['transactionTitle'],  
+      'transactionCategory': transactionData['transactionCategory'],  
+      'transactionDate': transactionData['transactionDate'],  
+    };
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final authToken = prefs.getString('authToken');
+      final response = await http.put(
+        Uri.parse(url),
+        headers: {'Authorization': 'Bearer $authToken', 'Content-Type': 'application/json'},
+        body: jsonEncode(ftransactionData),
+      );
+
+      print('response.statusCode ${response.statusCode}');
+      if (response.statusCode == 201) {
+        final dynamic jsonData = json.decode(response.body);
+        return Transaction(
+          amount: jsonData['transactionAmount'].toDouble() ?? 0.0,
+          title: jsonData['transactionTitle'] ?? "Unknown",
+          category: jsonData['transactionCategory'] ?? "Unknown",
+          date: DateTime.parse(jsonData['transactionDate']),
+        );
+      } else {
+        throw Exception('Failed to add transaction');
+      }
+    } catch (e) {
+      throw Exception('api_helper:Error adding transaction: $e');
+    }
+  }
+
 
 }

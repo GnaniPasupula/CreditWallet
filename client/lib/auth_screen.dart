@@ -14,7 +14,8 @@ class _AuthScreenState extends State<AuthScreen> {
   final TextEditingController _passwordController = TextEditingController();
 
   Future<void> _signup() async {
-    const url = 'http://localhost:3000/auth/signup';
+    // const url = 'http://localhost:3000/auth/signup';
+    const url = 'http://192.168.1.8:3000/auth/signup';
     final response = await http.post(
       Uri.parse(url),
       body: json.encode({
@@ -34,7 +35,8 @@ class _AuthScreenState extends State<AuthScreen> {
   }
 
   Future<void> _signin() async {
-    final url = 'http://localhost:3000/auth/signin';
+    // final url = 'http://localhost:3000/auth/signin';
+    const url = 'http://192.168.1.8:3000/auth/signin';
     final response = await http.post(
       Uri.parse(url),
       body: json.encode({
@@ -96,9 +98,7 @@ class _AuthScreenState extends State<AuthScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Authentication'),
-      ),
+      backgroundColor: Colors.black,
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -106,21 +106,36 @@ class _AuthScreenState extends State<AuthScreen> {
           children: [
             TextField(
               controller: _emailController,
-              decoration: InputDecoration(labelText: 'Email'),
-            ),
+              style: TextStyle(color: Colors.yellow), // Set text color to yellow
+              decoration: InputDecoration(
+                labelText: 'Email',
+                labelStyle: TextStyle(color: Colors.yellow), // Set label color to yellow
+                focusedBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: Colors.yellow), // Set focused border color to yellow
+                ),
+              ),             ),
             TextField(
               controller: _passwordController,
-              decoration: InputDecoration(labelText: 'Password'),
+              style: TextStyle(color: Colors.yellow), // Set text color to yellow
+              decoration: InputDecoration(
+                labelText: 'Password',
+                labelStyle: TextStyle(color: Colors.yellow), // Set label color to yellow
+                focusedBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: Colors.yellow), // Set focused border color to yellow
+                ),
+              ),              
               obscureText: true,
             ),
             SizedBox(height: 20),
             ElevatedButton(
               onPressed: _signup,
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.yellow), // Set button color to yellow
               child: Text('Sign Up'),
             ),
             SizedBox(height: 10),
             ElevatedButton(
               onPressed: _signin,
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.yellow), // Set button color to yellow
               child: Text('Sign In'),
             ),
           ],

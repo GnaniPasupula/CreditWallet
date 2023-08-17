@@ -7,6 +7,10 @@ import 'package:http/http.dart' as http;
 import 'api_helper.dart';
 
 class CreditCardForm extends StatefulWidget {
+   final VoidCallback onCardAdded;
+
+  CreditCardForm({required this.onCardAdded});
+
   @override
   _CreditCardFormState createState() => _CreditCardFormState();
 }
@@ -52,6 +56,8 @@ class _CreditCardFormState extends State<CreditCardForm> {
 
       if (creditCardData != null) {
         log('Credit card added successfully: $creditCardData');
+        widget.onCardAdded(); // Call the callback to notify parent widget
+        Navigator.of(context).pop();
       } else {
         log('Error adding credit card');
       }
