@@ -152,18 +152,52 @@ class _CreditCardScreenState extends State<CreditCardScreen> {
                   onPageChanged: onPageChanged,
                   itemBuilder: (context, index) {
                     final card = creditCards[index];
-                    Widget  getCardType(String cardNumber) {
-                    if (cardNumber.startsWith('4')) {
-                      return Image.asset('../web/icons/visa.png', width: 30, height: 30); 
-                    } else if (cardNumber.startsWith('5')) {
-                      return Image.asset('../web/icons/mastercard.png', width: 36, height: 36); 
-                    } else if (cardNumber.startsWith('3')) {
-                      return Image.asset('../web/icons/amex.png', width: 36, height: 36); 
-                    } else if (cardNumber.startsWith('6')) {
-                      return Image.asset('../web/icons/rupay.png', width: 36, height: 36);
+
+                    LinearGradient cardGradient;
+
+                    if (card.cardNumber.startsWith('4')) {
+                      cardGradient = LinearGradient(
+                        colors: [Color(0xffde6262), Color(0xffffb88c)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      );
+                    } else if (card.cardNumber.startsWith('5')) {
+                      cardGradient = LinearGradient(
+                        colors: [Colors.blueAccent, Colors.indigo],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      );
+                    } else if (card.cardNumber.startsWith('3')) {
+                      cardGradient = LinearGradient(
+                        colors: [Color(0xff7bc393), Color(0xff31b7c2)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      );
+                    } else if (card.cardNumber.startsWith('6')) {
+                      cardGradient = LinearGradient(
+                        colors: [Color(0xffffa31d), Color(0xffef5454)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      );
                     } else {
-                      return Image.asset('../web/icons/mastercard.png', width: 36, height: 36); 
-                    }
+                      cardGradient = LinearGradient(
+                        colors: [Color(0xffcc2b5e), Color(0xff753a88)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      );
+                    }          
+                    Widget  getCardType(String cardNumber) {
+                      if (cardNumber.startsWith('4')) {
+                        return Image.asset('../web/icons/visa.png', width: 28, height: 28); 
+                      } else if (cardNumber.startsWith('5')) {
+                        return Image.asset('../web/icons/mastercard.png', width: 36, height: 36); 
+                      } else if (cardNumber.startsWith('3')) {
+                        return Image.asset('../web/icons/amex.png', width: 36, height: 36); 
+                      } else if (cardNumber.startsWith('6')) {
+                        return Image.asset('../web/icons/rupay.png', width: 36, height: 36);
+                      } else {
+                        return Image.asset('../web/icons/mastercard.png', width: 36, height: 36); 
+                      }
                   }
                     return Padding(
                       padding: EdgeInsets.symmetric(horizontal: 16),
@@ -172,8 +206,12 @@ class _CreditCardScreenState extends State<CreditCardScreen> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
                         ),
-                        color: Colors.blue,
+                        color: Colors.transparent, // Set color to transparent to allow gradient to show
                         child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(16),
+                            gradient: cardGradient, // Set the determined gradient here
+                          ),
                           padding: EdgeInsets.all(16),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -303,7 +341,7 @@ class _CreditCardScreenState extends State<CreditCardScreen> {
                         },
                         icon: Icon(Icons.add_circle), // Circular "+" button
                         color: Colors.yellow,
-                        iconSize: 30,
+                        iconSize: 36,
                       ),
                     ],
                   ),

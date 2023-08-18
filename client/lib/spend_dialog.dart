@@ -57,6 +57,13 @@ class _SpendDetailsDialogState extends State<SpendDetailsDialog> {
         formData,
       );
 
+      // setState(() {
+      //   final currentCard = widget.creditCards[widget.currentIndex];
+      //   currentCard.outStanding += addedTransaction!.amount;
+      // });
+
+      print("helooo");
+
       if (addedTransaction != null) {
         widget.onSave.call(addedTransaction);
         Navigator.of(context).pop(addedTransaction);
