@@ -5,11 +5,19 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 import 'api_helper.dart';
+import 'credit_card_data.dart';
 
 class CreditCardForm extends StatefulWidget {
-   final VoidCallback onCardAdded;
+  final VoidCallback onCardAdded;
+  final bool isEditing;
+  final CreditCardData? creditCard;
 
-  CreditCardForm({required this.onCardAdded});
+  CreditCardForm({
+    Key? key,
+    required this.onCardAdded,
+    required this.isEditing,
+    this.creditCard,
+  }) : super(key: key);
 
   @override
   _CreditCardFormState createState() => _CreditCardFormState();
@@ -23,6 +31,29 @@ class _CreditCardFormState extends State<CreditCardForm> {
   final TextEditingController _cardNameController = TextEditingController();
   final TextEditingController _bankNameController = TextEditingController();
 
+  bool _isEditing = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _isEditing = widget.isEditing;
+
+    if (_isEditing) {
+      _populateFormFields(widget.creditCard);
+    }
+  }
+
+  void _populateFormFields(CreditCardData? creditCard) {
+    if (creditCard != null) {
+      _cardNumberController.text = creditCard.cardNumber;
+      _limitController.text = creditCard.limit.toString();
+      _outstandingController.text = creditCard.outStanding.toString();
+      _expiryDateController.text = creditCard.expiryDate;
+      _cardNameController.text = creditCard.cardName;
+      _bankNameController.text = creditCard.bankName;
+    }
+  }
+
   @override
   void dispose() {
     _cardNumberController.dispose();
@@ -34,7 +65,7 @@ class _CreditCardFormState extends State<CreditCardForm> {
     super.dispose();
   }
 
- void _submitForm() async {
+  void _submitForm() async {
     final formData = {
       'cardNumber': _cardNumberController.text,
       'limit': _limitController.text,
@@ -45,21 +76,39 @@ class _CreditCardFormState extends State<CreditCardForm> {
     };
 
     try {
-      final creditCardData = await ApiHelper.addCreditCard(
-        formData['cardNumber']!,
-        double.parse(formData['limit']!),
-        double.parse(formData['outStanding']!),
-        formData['expiryDate']!,
-        formData['cardName']!,
-        formData['bankName']!,
-      );
+      if (_isEditing) {
+        final updatedCard = await ApiHelper.updateCreditCard(
+          formData['cardNumber']!,
+          double.parse(formData['limit']!),
+          double.parse(formData['outStanding']!),
+          formData['expiryDate']!,
+          formData['cardName']!,
+          formData['bankName']!,
+        );
 
-      if (creditCardData != null) {
-        log('Credit card added successfully: $creditCardData');
-        widget.onCardAdded(); // Call the callback to notify parent widget
-        Navigator.of(context).pop();
+        if (updatedCard != null) {
+          log('Credit card updated successfully: $updatedCard');
+          Navigator.of(context).pop(updatedCard);
+        } else {
+          log('Error updating credit card');
+        }
       } else {
-        log('Error adding credit card');
+        final creditCardData = await ApiHelper.addCreditCard(
+          formData['cardNumber']!,
+          double.parse(formData['limit']!),
+          double.parse(formData['outStanding']!),
+          formData['expiryDate']!,
+          formData['cardName']!,
+          formData['bankName']!,
+        );
+
+        if (creditCardData != null) {
+          log('Credit card added successfully: $creditCardData');
+          widget.onCardAdded(); // Call the callback to notify parent widget
+          Navigator.of(context).pop();
+        } else {
+          log('Error adding credit card');
+        }
       }
     } catch (e) {
       log('Error submitting form data: $e');
@@ -97,7 +146,7 @@ class _CreditCardFormState extends State<CreditCardForm> {
                   decoration: InputDecoration(labelText: 'Expiry Date'),
                 ),
                 TextFormField(
-                  controller: _cardNameController, 
+                  controller: _cardNameController,
                   decoration: InputDecoration(labelText: 'Card Name'),
                 ),
                 TextFormField(
@@ -107,10 +156,9 @@ class _CreditCardFormState extends State<CreditCardForm> {
                 SizedBox(height: 16),
                 ElevatedButton(
                   onPressed: () {
-                    Navigator.of(context).pop();
                     _submitForm();
                   },
-                  child: Text('Submit'),
+                  child: Text(_isEditing ? 'Update' : 'Submit'),
                 ),
               ],
             ),

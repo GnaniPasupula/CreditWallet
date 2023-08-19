@@ -88,6 +88,7 @@ class _CreditCardScreenState extends State<CreditCardScreen> {
                               }
                               _fetchCreditCardData(); // Update the creditCards list
                             },
+                            isEditing: false,
                           ); // Show the credit card form as a bottom sheet
                         },
                       );
@@ -102,6 +103,45 @@ class _CreditCardScreenState extends State<CreditCardScreen> {
                     ),
                     child: Center(
                       child: Icon(Icons.add,
+                      color: Colors.black,
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(width: 8),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () async {
+                        final updatedCreditCard = await showModalBottomSheet<CreditCardData?>(
+                        context: context,
+                        isScrollControlled: true,
+                        builder: (BuildContext context) {
+                          return CreditCardForm(
+                            onCardAdded: () {
+                              _fetchCreditCardData(); // Update the creditCards list
+                            },
+                            isEditing: true,
+                            creditCard: creditCards[currentIndex]
+                          ); // Show the credit card form as a bottom sheet
+                        },
+                      );
+                        if (updatedCreditCard != null) {
+                          setState(() {
+                            // Update the credit card data in your list with the updated data
+                            creditCards[currentIndex] = updatedCreditCard;
+                          });
+                        }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      primary: Colors.white,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        side: BorderSide(color: Colors.black, width: 1.5),
+                      ),
+                    ),
+                    child: Center(
+                      child: Icon(Icons.edit,
                       color: Colors.black,
                       ),
                     ),
@@ -359,17 +399,20 @@ class _CreditCardScreenState extends State<CreditCardScreen> {
                       if (transactionDate.year == now.year &&
                           transactionDate.month == now.month &&
                           transactionDate.day == now.day) {
-                        // Show time in 12hr format if it's today
-                        formattedDate = DateFormat.jm().format(transactionDate);
+                        // Show time in 12hr format along with the date if it's today
+                        formattedDate = DateFormat('d MMM h:mm a').format(transactionDate);
                       } else if (transactionDate.year == now.year &&
                           transactionDate.month == now.month &&
                           transactionDate.day == now.day - 1) {
-                        // Show "Yesterday" if it's yesterday
-                        formattedDate = 'Yesterday';
+                        // Show "Yesterday" along with the time if it's yesterday
+                        formattedDate = 'Yesterday ' + DateFormat.jm().format(transactionDate);
                       } else {
-                        // Show date in the format "day Month"
-                        formattedDate = DateFormat('d MMM').format(transactionDate);
+                        // Show date in the format "day Month" along with the time
+                        formattedDate = DateFormat('d MMM').format(transactionDate) +
+                            ' ' +
+                            DateFormat.jm().format(transactionDate);
                       }
+
                         return Dismissible(
                             key: Key(transaction.date.toString()), // Use a unique identifier for each transaction
                             direction: DismissDirection.endToStart,

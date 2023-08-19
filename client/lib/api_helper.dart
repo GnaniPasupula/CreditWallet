@@ -63,6 +63,47 @@ static Future<CreditCardData?> deleteCreditCard(String cardNumber) async {
   }
 }
 
+static Future<CreditCardData?> updateCreditCard(
+    String cardNumber,
+    double limit,
+    double outStanding,
+    String expiryDate,
+    String cardName,
+    String bankName,
+  ) async {
+    final url = '$baseUrl/creditCard/update/$cardNumber';
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final authToken = prefs.getString('authToken');
+
+      final response = await http.put(
+        Uri.parse(url),
+        headers: {
+          'Authorization': 'Bearer $authToken',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'limit': limit,
+          'outStanding': outStanding,
+          'expiryDate': expiryDate,
+          'cardName': cardName,
+          'bankName': bankName,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final dynamic jsonData = json.decode(response.body);
+        return CreditCardData.fromJson(jsonData);
+      } else {
+        throw Exception('Failed to update credit card');
+      }
+    } catch (e) {
+      throw Exception('Error updating credit card: $e');
+    }
+  }
+
+
 static Future<CreditCardData?> addCreditCard(
     String cardNumber,
     double limit,
