@@ -10,8 +10,10 @@ class AuthScreen extends StatefulWidget {
 }
 
 class _AuthScreenState extends State<AuthScreen> {
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _signInEmailController = TextEditingController();
+  final TextEditingController _signInPasswordController = TextEditingController();
+  final TextEditingController _signUpEmailController = TextEditingController();
+  final TextEditingController _signUpPasswordController = TextEditingController();
   final TextEditingController _confirmPasswordController = TextEditingController(); 
 
   bool _isSignIn = true; // Initially set to Sign In
@@ -20,13 +22,13 @@ class _AuthScreenState extends State<AuthScreen> {
    @override
   void initState() {
     super.initState();
-    _passwordController.addListener(updatePasswordsMatch);
+    _signUpPasswordController.addListener(updatePasswordsMatch);
     _confirmPasswordController.addListener(updatePasswordsMatch);
   }
 
   void updatePasswordsMatch() {
     setState(() {
-      passwordsMatch = _passwordController.text == _confirmPasswordController.text;
+      passwordsMatch = _signUpPasswordController.text == _confirmPasswordController.text;
     });
   }
 
@@ -36,8 +38,8 @@ class _AuthScreenState extends State<AuthScreen> {
     final response = await http.post(
       Uri.parse(url),
       body: json.encode({
-        'email': _emailController.text,
-        'password': _passwordController.text,
+        'email': _signUpEmailController.text,
+        'password': _signUpPasswordController.text,
       }),
       headers: {'Content-Type': 'application/json'},
     );
@@ -57,8 +59,8 @@ class _AuthScreenState extends State<AuthScreen> {
     final response = await http.post(
       Uri.parse(url),
       body: json.encode({
-        'email': _emailController.text,
-        'password': _passwordController.text,
+        'email': _signInEmailController.text,
+        'password': _signInPasswordController.text,
       }),
       headers: {'Content-Type': 'application/json'},
     );
@@ -76,7 +78,7 @@ class _AuthScreenState extends State<AuthScreen> {
     }
   }
 
-    void _showSuccessDialog(String message) {
+  void _showSuccessDialog(String message) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -114,10 +116,8 @@ class _AuthScreenState extends State<AuthScreen> {
     );
   }
 
-
   @override
   Widget build(BuildContext context) {
-    bool passwordsMatch = _passwordController.text == _confirmPasswordController.text;
     return Scaffold(
       backgroundColor: Colors.black, // Set a dark background color
       body: Center(
@@ -171,45 +171,77 @@ class _AuthScreenState extends State<AuthScreen> {
               ),
 
               SizedBox(height: 20),
-            TextField(
-              controller: _emailController,
-              style: TextStyle(color: Colors.yellow), // Set text color to yellow
-              decoration: const InputDecoration(
-                labelText: 'Email',
-                labelStyle: TextStyle(color: Colors.yellow), // Set label color to yellow
-                focusedBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(color: Colors.yellow), // Set focused border color to yellow
-                ),
-              ),             
-            ),
-            TextField(
-              controller: _passwordController,
-              style: TextStyle(color: Colors.yellow), // Set text color to yellow
-              decoration: const InputDecoration(
-                labelText: 'Password',
-                labelStyle: TextStyle(color: Colors.yellow), // Set label color to yellow
-                focusedBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(color: Colors.yellow), // Set focused border color to yellow
-                ),
-              ),              
-              obscureText: true,
-            ),
-            if (!_isSignIn) // Display Confirm Password field only for Sign Up
-                TextField(
-                  controller: _confirmPasswordController,
-                  style: TextStyle(color: Colors.yellow),
-                  decoration: const InputDecoration(
-                    labelText: 'Confirm Password',
-                    labelStyle: TextStyle(color: Colors.yellow),
-                    focusedBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: Colors.yellow),
+              if (_isSignIn) // Display Sign In fields
+                Column(
+                  children: [
+                    TextField(
+                      controller: _signInEmailController,
+                      style: TextStyle(color: Colors.yellow),
+                      decoration: const InputDecoration(
+                        labelText: 'Username',
+                        labelStyle: TextStyle(color: Colors.yellow),
+                        focusedBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(color: Colors.yellow),
+                        ),
+                      ),
                     ),
-                  ),
-                  obscureText: true,
+                    TextField(
+                      controller: _signInPasswordController,
+                      style: TextStyle(color: Colors.yellow),
+                      decoration: const InputDecoration(
+                        labelText: 'Password',
+                        labelStyle: TextStyle(color: Colors.yellow),
+                        focusedBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(color: Colors.yellow),
+                        ),
+                      ),
+                      obscureText: true,
+                    ),
+                  ],
+                ),
+              if (!_isSignIn) // Display Sign Up fields
+                Column(
+                  children: [
+                    TextField(
+                      controller: _signUpEmailController,
+                      style: TextStyle(color: Colors.yellow),
+                      decoration: const InputDecoration(
+                        labelText: 'Username',
+                        labelStyle: TextStyle(color: Colors.yellow),
+                        focusedBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(color: Colors.yellow),
+                        ),
+                      ),
+                    ),
+                    TextField(
+                      controller: _signUpPasswordController,
+                      style: TextStyle(color: Colors.yellow),
+                      decoration: const InputDecoration(
+                        labelText: 'Password',
+                        labelStyle: TextStyle(color: Colors.yellow),
+                        focusedBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(color: Colors.yellow),
+                        ),
+                      ),
+                      obscureText: true,
+                    ),
+                    TextField(
+                      controller: _confirmPasswordController,
+                      style: TextStyle(color: Colors.yellow),
+                      decoration: const InputDecoration(
+                        labelText: 'Confirm Password',
+                        labelStyle: TextStyle(color: Colors.yellow),
+                        focusedBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(color: Colors.yellow),
+                        ),
+                      ),
+                      obscureText: true,
+                    ),
+                  ],
                 ),
               SizedBox(height: 20),
               AbsorbPointer(
-                absorbing: !passwordsMatch,
+                absorbing: _isSignIn ? false : !passwordsMatch,
                 child: ElevatedButton(
                   onPressed: (_isSignIn ? _signin : _signup),
                   style: ElevatedButton.styleFrom(
@@ -220,9 +252,9 @@ class _AuthScreenState extends State<AuthScreen> {
                     ),
                   ),
                   child: IgnorePointer(
-                    ignoring: !passwordsMatch,
+                    ignoring: (!_isSignIn && !passwordsMatch),
                     child: Opacity(
-                      opacity: passwordsMatch ? 1.0 : 0.5,
+                      opacity: (passwordsMatch && _signUpPasswordController.text.length!=0) || _isSignIn? 1.0 : 0.5,
                       child: Text(
                         _isSignIn ? 'Sign In' : 'Sign Up',
                         style: TextStyle(
