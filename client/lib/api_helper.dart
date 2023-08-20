@@ -158,6 +158,7 @@ static Future<CreditCardData?> addCreditCard(
       'transactionTitle': transactionData['transactionTitle'],  
       'transactionCategory': transactionData['transactionCategory'],  
       'transactionDate': transactionData['transactionDate'],  
+      'transactionNote': transactionData['transactionNote'],  
     };
 
     try {
@@ -177,6 +178,7 @@ static Future<CreditCardData?> addCreditCard(
           title: jsonData['transactionTitle'] ?? "Unknown",
           category: jsonData['transactionCategory'] ?? "Unknown",
           date: DateTime.parse(jsonData['transactionDate']),
+          note:jsonData['transactionNote'] ?? ""
         );
       } else {
         throw Exception('Failed to add transaction');

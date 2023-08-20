@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'api_helper.dart';
 import 'credit_card_data.dart';
@@ -7,14 +5,13 @@ import 'credit_card_data.dart';
 class SpendDetailsDialog extends StatefulWidget {
   final Function(Transaction) onSave;
   final List<CreditCardData> creditCards;
-  final int currentIndex; 
+  final int currentIndex;
 
   SpendDetailsDialog({
     required this.onSave,
     required this.creditCards,
     required this.currentIndex,
   });
-
 
   @override
   _SpendDetailsDialogState createState() => _SpendDetailsDialogState();
@@ -23,16 +20,16 @@ class SpendDetailsDialog extends StatefulWidget {
 class _SpendDetailsDialogState extends State<SpendDetailsDialog> {
   final TextEditingController titleController = TextEditingController();
   final TextEditingController amountController = TextEditingController();
-  final TextEditingController categoryController = TextEditingController();
-
+  final TextEditingController noteController = TextEditingController();
   DateTime selectedDate = DateTime.now();
   TimeOfDay selectedTime = TimeOfDay.now();
+  String selectedCategory = "Food"; // Default selected category
 
   @override
   void dispose() {
     titleController.dispose();
     amountController.dispose();
-    categoryController.dispose();
+    noteController.dispose();
     super.dispose();
   }
 
@@ -40,16 +37,10 @@ class _SpendDetailsDialogState extends State<SpendDetailsDialog> {
     final formData = {
       'transactionAmount': amountController.text,
       'transactionTitle': titleController.text,
-      'transactionCategory': categoryController.text,
+      'transactionCategory': selectedCategory,
       'transactionDate': selectedDate.toIso8601String(),
+      'transactionNote': noteController.text,
     };
-
-    // print('Title: ${titleController.text}');
-    // print('Amount: ${amountController.text}');
-    // print('Category: ${categoryController.text}');
-    // print('Date: $selectedDate');
-
-    // print('form data :${formData}');
 
     try {
       final addedTransaction = await ApiHelper.addTransactionToCard(
@@ -57,23 +48,16 @@ class _SpendDetailsDialogState extends State<SpendDetailsDialog> {
         formData,
       );
 
-      // setState(() {
-      //   final currentCard = widget.creditCards[widget.currentIndex];
-      //   currentCard.outStanding += addedTransaction!.amount;
-      // });
-
-      print("helooo");
-
       if (addedTransaction != null) {
         widget.onSave.call(addedTransaction);
         Navigator.of(context).pop(addedTransaction);
       } else {
         // Handle error case
-        print("spend_dialog:Erros adding transaction data1");
+        print("spend_dialog:Error adding transaction data");
       }
     } catch (e) {
       // Handle error case
-      print("spend_dialog:Erros adding transaction data2${e}");
+      print("spend_dialog:Error adding transaction data: $e");
     }
   }
 
@@ -93,9 +77,38 @@ class _SpendDetailsDialogState extends State<SpendDetailsDialog> {
             decoration: InputDecoration(labelText: 'Amount'),
             keyboardType: TextInputType.numberWithOptions(decimal: true),
           ),
-          TextField(
-            controller: categoryController,
+
+          DropdownButtonFormField<String>(
+            value: selectedCategory,
+            onChanged: (String? newValue) {
+              if (newValue != null) {
+                setState(() {
+                  selectedCategory = newValue;
+                });
+              }
+            },
+            items: <String>[
+              "Fashion",
+              "Food",
+              "Health",
+              "Fuel",
+              "Travel",
+              "Entertainment",
+              "EMI",
+              "Bills",
+              "Others",
+            ].map<DropdownMenuItem<String>>((String value) {
+              return DropdownMenuItem<String>(
+                value: value,
+                child: Text(value),
+              );
+            }).toList(),
             decoration: InputDecoration(labelText: 'Category'),
+          ),
+          TextField(
+            controller: noteController,
+            decoration: InputDecoration(labelText: 'Note'),
+            keyboardType: TextInputType.numberWithOptions(decimal: true),
           ),
           Row(
             children: [
@@ -113,7 +126,9 @@ class _SpendDetailsDialogState extends State<SpendDetailsDialog> {
                     });
                   }
                 },
-                child: Text('Select Date'),
+                child: Text(
+                  'Date |${selectedDate.day}/${selectedDate.month}/${selectedDate.year}|',
+                ),
               ),
               SizedBox(width: 20),
               TextButton(
@@ -128,7 +143,9 @@ class _SpendDetailsDialogState extends State<SpendDetailsDialog> {
                     });
                   }
                 },
-                child: Text('Select Time'),
+                child: Text(
+                  'Time |${selectedTime.hour}:${selectedTime.minute}|',
+                ),
               ),
             ],
           ),
@@ -144,21 +161,26 @@ class _SpendDetailsDialogState extends State<SpendDetailsDialog> {
         TextButton(
           onPressed: () {
             final transaction = Transaction(
-              date: DateTime(selectedDate.year, selectedDate.month, selectedDate.day, selectedTime.hour, selectedTime.minute),
+              date: DateTime(
+                selectedDate.year,
+                selectedDate.month,
+                selectedDate.day,
+                selectedTime.hour,
+                selectedTime.minute,
+              ),
               amount: double.tryParse(amountController.text) ?? 0.0,
               title: titleController.text,
-              category: categoryController.text,
+              category: selectedCategory,
+              note: noteController.text
             );
 
             widget.onSave(transaction);
             Navigator.of(context).pop();
             _submitForm();
-
           },
           child: Text('Save'),
         ),
       ],
-      
     );
   }
 }

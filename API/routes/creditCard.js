@@ -93,7 +93,7 @@ router.delete('/delete/:cardNumber', async (req, res) => {
 // Add transaction amount to already existing outstanding balance with cardNumber
 router.put('/addTransaction/:cardNumber', async (req, res) => {
   const { cardNumber } = req.params;
-  const { transactionAmount,transactionTitle,transactionCategory,transactionDate } = req.body;
+  const { transactionAmount,transactionTitle,transactionCategory,transactionDate , transactionNote } = req.body;
   const userId = req.user.userId; // Extracted from the JWT token
 
   try {
@@ -101,7 +101,7 @@ router.put('/addTransaction/:cardNumber', async (req, res) => {
       { cardNumber, user: userId },
       {
         $inc: { outStanding: transactionAmount  },
-        $push: { transactions: { amount:transactionAmount,title:transactionTitle,category:transactionCategory,date:transactionDate } }, // Include all transaction details
+        $push: { transactions: { amount:transactionAmount,title:transactionTitle,category:transactionCategory,date:transactionDate,note:transactionNote } }, // Include all transaction details
       },
       { new: true }
     );
@@ -112,6 +112,7 @@ router.put('/addTransaction/:cardNumber', async (req, res) => {
       transactionAmount: transactionAmount,
       transactionTitle: transactionTitle,
       transactionCategory: transactionCategory,
+      transactionNote: transactionNote,
     });
     } catch (err) {
     console.error('Error updating credit card:', err);

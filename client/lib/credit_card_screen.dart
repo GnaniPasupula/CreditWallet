@@ -16,6 +16,18 @@ class _CreditCardScreenState extends State<CreditCardScreen> {
   int currentIndex = 0;
   bool _isSpendDialogVisible = false;
 
+  final Map<String, IconData> categoryIcons = {
+    'Fashion': Icons.shopping_bag_outlined,
+    'Food': Icons.restaurant_outlined,
+    'Health': Icons.local_hospital_outlined,
+    'Fuel': Icons.local_gas_station_outlined,
+    'Travel': Icons.flight_outlined,
+    'Entertainment': Icons.movie_filter,
+    'EMI': Icons.attach_money_outlined,
+    'Bills': Icons.receipt_long_outlined,
+    'Others': Icons.category_outlined,
+  };
+
   @override
   void initState() {
     super.initState();
@@ -391,7 +403,7 @@ class _CreditCardScreenState extends State<CreditCardScreen> {
                     itemCount: creditCards.isNotEmpty ? creditCards[currentIndex].transactions.length : 0,
                     itemBuilder: (context, transactionIndex) {
                       final transaction = creditCards[currentIndex].transactions[transactionIndex];
-
+                      final transactionCategory = transaction.category;
                       final now = DateTime.now();
                       final transactionDate = transaction.date;
                       String formattedDate;
@@ -445,15 +457,16 @@ class _CreditCardScreenState extends State<CreditCardScreen> {
                               }
                             },
                       child:Card(
-                        elevation: 4,
+                        elevation: 0,
+                        color: Colors.grey[50],
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
                         ),
                         margin: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                         child: ListTile(
+                          contentPadding: EdgeInsets.symmetric(vertical: 6, horizontal: 16), // Adjust content padding
                           leading: CircleAvatar(
-                            // You can replace this with the actual picture data
-                            child: Icon(Icons.account_balance_wallet),
+                            child:Icon(categoryIcons[transactionCategory] ?? Icons.question_mark),
                             radius: 16,
                           ),
                           title: Column(
@@ -467,7 +480,7 @@ class _CreditCardScreenState extends State<CreditCardScreen> {
                                 ),
                               ),
                               Text(
-                                transaction.category,
+                                transaction.note,
                                 style: TextStyle(fontSize: 14, color: Colors.grey),
                               ),
                             ],

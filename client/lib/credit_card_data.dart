@@ -25,6 +25,7 @@ class CreditCardData {
         amount: transaction['amount'].toDouble(),
         title: transaction['title'] ?? "Unknown",
         category: transaction['category'] ?? "Unknown",
+        note: transaction['note'] ?? ""
       );
     }).toList();
 
@@ -45,11 +46,13 @@ class Transaction {
   final double amount;
   final String title;
   final String category;
+  final String note;
 
   Transaction({
     required this.date,
     required this.amount,
     required this.title,
     required this.category,
+    required this.note,
   });
 }
