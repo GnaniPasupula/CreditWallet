@@ -213,6 +213,33 @@ static Future<CreditCardData?> addCreditCard(
     }
   }
 
+  static Future<List<dynamic>> getAllTransactions() async {
+  
+
+    final url = '$baseUrl/creditCard/transactions';
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final authToken = prefs.getString('authToken');
+      final response = await http.get(
+        Uri.parse(url),
+        headers: {
+          'Authorization': 'Bearer $authToken',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        return data;
+      } else {
+        throw Exception('Failed to get transactions');
+      }
+    } catch (e) {
+      throw Exception('Error getting transactions: $e');
+    }
+  }
+
 
 
 }

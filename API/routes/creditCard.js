@@ -159,6 +159,30 @@ router.get('/transactions/:cardNumber', async (req, res) => {
   }
 });
 
+// Get all transactions of a specific user
+router.get('/transactions/', async (req, res) => {
+  const userId = req.user.userId; // Extracted from the JWT token
+
+  try {
+    console.log('Fetching transactions for user ID:', userId);
+
+    const creditCards = await CreditCard.find({ user: userId }).populate('transactions');
+    if (!creditCards) {
+      console.log('Credit cards not found for user ID:', userId);
+      return res.status(404).send('Credit cards not found');
+    }
+
+    const allTransactions = creditCards.flatMap(creditCard => creditCard.transactions);
+
+    console.log('Found credit cards and transactions for user ID:', userId);
+    res.status(200).json(allTransactions);
+  } catch (err) {
+    console.error('Error getting transactions:', err);
+    res.status(500).send('Error getting transactions. Please try again.');
+  }
+});
+
+
 
 
 module.exports = router;

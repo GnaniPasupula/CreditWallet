@@ -1,5 +1,6 @@
 import 'package:client/spend_dialog.dart';
 import 'package:flutter/material.dart';
+import 'analytics_screen.dart';
 import 'api_helper.dart';
 import 'credit_card_data.dart';
 import 'credit_card_form.dart'; 
@@ -15,6 +16,12 @@ class _CreditCardScreenState extends State<CreditCardScreen> {
   late PageController _pageController;
   int currentIndex = 0;
   bool _isSpendDialogVisible = false;
+  static const int _searchTabIndex = 0;
+  static const int _analyticsTabIndex = 1;
+
+  int _currentIndex = _searchTabIndex; // Initial index
+
+
 
   final Map<String, IconData> categoryIcons = {
     'Fashion': Icons.shopping_bag_outlined,
@@ -79,7 +86,7 @@ class _CreditCardScreenState extends State<CreditCardScreen> {
           ),
         ],
       ),
-      body: Column(
+      body: Stack ( children:[ Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
         Padding(
@@ -516,6 +523,50 @@ class _CreditCardScreenState extends State<CreditCardScreen> {
 
         ],
       ),
+        Positioned(
+          left: MediaQuery.of(context).size.width / 2 - 64,
+          right: MediaQuery.of(context).size.width / 2 - 64,
+          bottom: 16, // Adjust this value for the desired distance from the bottom
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.grey[100],
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                IconButton(
+                  onPressed: () {
+                    setState(() {
+                      _currentIndex = 0;
+                    });
+                  },
+                  icon: Icon(Icons.search_outlined),
+                  color: Color.fromARGB(255, 0, 0, 0),
+                  iconSize: 30,
+                ),
+                IconButton(
+                  onPressed: () {
+                    setState(() {
+                      _currentIndex = 1;
+                    });
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => AnalyticsPage()),
+                    );
+                  },
+                  icon: Icon(Icons.analytics_outlined),
+                  color: Color.fromARGB(255, 0, 0, 0),
+                  iconSize: 30,
+                ),
+              ],
+            ),
+          ),
+        ),
+
+      ]
+      )
+
     );
   }
 }
