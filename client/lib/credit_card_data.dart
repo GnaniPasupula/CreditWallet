@@ -1,7 +1,7 @@
 class CreditCardData {
   final String cardNumber;
   final double limit;
-  final double outStanding;
+  double outStanding;
   final String expiryDate;
   final String cardName;
   final String bankName;

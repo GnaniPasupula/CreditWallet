@@ -383,6 +383,7 @@ class _CreditCardScreenState extends State<CreditCardScreen> {
                                 onSave: (transaction) {
                                   setState(() {
                                     creditCards[currentIndex].transactions.add(transaction);
+                                    creditCards[currentIndex].outStanding += transaction.amount;
                                   });
                                 },
                                 creditCards: creditCards,
@@ -451,6 +452,7 @@ class _CreditCardScreenState extends State<CreditCardScreen> {
                                 // Update the local list of transactions
                                 setState(() {
                                   creditCards[currentIndex].transactions.removeAt(transactionIndex);
+                                  creditCards[currentIndex].outStanding -= transaction.amount;
                                 });
                               } catch (e) {
                                 print('Error deleting transaction: $e');
