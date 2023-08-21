@@ -372,7 +372,7 @@ class _CreditCardScreenState extends State<CreditCardScreen> {
                     children: [
                       Expanded(
                         child: Text(
-                          'All Transactions', // Transaction text at top left
+                          'Card Transactions', // Transaction text at top left
                           style: TextStyle(
                             fontWeight: FontWeight.w600,
                             fontSize: 18,
@@ -414,6 +414,7 @@ class _CreditCardScreenState extends State<CreditCardScreen> {
                       final transactionCategory = transaction.category;
                       final now = DateTime.now();
                       final transactionDate = transaction.date;
+
                       String formattedDate;
 
                       if (transactionDate.year == now.year &&

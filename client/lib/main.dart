@@ -6,13 +6,29 @@ void main() {
   runApp(MyApp());
 }
 
+  final List<Color> gradientColor = [
+    const Color(0xffffa31d),
+    const Color(0xffef5454),
+  ];
+
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Your App Title',
       theme: ThemeData(
-        primarySwatch: Colors.blue
+        primarySwatch: MaterialColor(0xffef5454, <int, Color>{
+          50:  gradientColor[0],
+          100: gradientColor[0],
+          200: gradientColor[0],
+          300: gradientColor[0],
+          400: gradientColor[0],
+          500: gradientColor[0],
+          600: gradientColor[0],
+          700: gradientColor[0],
+          800: gradientColor[0],
+          900: gradientColor[0],
+        }),      
       ),
       routes: {
         '/': (ctx) => AuthScreen(), // Auth route
