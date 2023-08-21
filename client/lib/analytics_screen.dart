@@ -175,7 +175,8 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
           var transaction = transactions[transactionIndex];
           final transactionDate = DateTime.parse(transaction['date']);
           String formattedDate = DateFormat('d MMM h:mm a').format(transactionDate);
-          var transactionCategory = transaction['category']; 
+          var transactionCategory = transaction['category'];
+           
           return Card(
             elevation: 0,
             color: Colors.grey[50],

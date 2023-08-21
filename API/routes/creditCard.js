@@ -182,6 +182,35 @@ router.get('/transactions/', async (req, res) => {
   }
 });
 
+// Delete a specific transaction of the currently signed-in user
+router.delete('/transactions/:transactionId', async (req, res) => {
+  const userId = req.user.userId; // Extracted from the JWT token
+  const transactionId = req.params.transactionId;
+
+  try {
+    const creditCard = await CreditCard.findOne({ user: userId, transactions: transactionId });
+    
+    if (!creditCard) {
+      console.log('Credit card or transaction not found for user ID and transaction ID:', userId, transactionId);
+      return res.status(404).send('Credit card or transaction not found');
+    }
+
+    // Remove the transaction from the credit card and save
+    creditCard.transactions.pull(transactionId);
+    await creditCard.save();
+
+    // Delete the transaction from the database
+    await Transaction.findByIdAndDelete(transactionId);
+
+    console.log('Deleted transaction for user ID and transaction ID:', userId, transactionId);
+    res.status(200).json({ message: 'Transaction deleted successfully' });
+  } catch (err) {
+    console.error('Error deleting transaction:', err);
+    res.status(500).send('Error deleting transaction. Please try again.');
+  }
+});
+
+
 
 
 

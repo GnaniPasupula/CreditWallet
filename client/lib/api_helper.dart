@@ -240,6 +240,28 @@ static Future<CreditCardData?> addCreditCard(
     }
   }
 
+  // static Future<void> deleteTransaction(String transactionId) async {
+  //   final url = '$baseUrl/creditCard/transactions/$transactionId'; 
+
+  //   try {
+  //     final prefs = await SharedPreferences.getInstance();
+  //     final authToken = prefs.getString('authToken');
+  //     final response = await http.delete(
+  //       Uri.parse(url),
+  //       headers: {
+  //         'Authorization': 'Bearer $authToken',
+  //         'Content-Type': 'application/json',
+  //       },
+  //     );
+
+  //     if (response.statusCode != 200) {
+  //       throw Exception('Failed to delete transaction');
+  //     }
+  //   } catch (e) {
+  //     throw Exception('Error deleting transaction: $e');
+  //   }
+  // }
+
 
 
 }
