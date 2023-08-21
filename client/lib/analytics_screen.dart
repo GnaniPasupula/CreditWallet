@@ -37,7 +37,12 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
     try {
       final fetchedTransactions = await ApiHelper.getAllTransactions();
       setState(() {
-        transactions = fetchedTransactions;
+          transactions = fetchedTransactions;
+          transactions.sort((a, b) {
+          DateTime dateA = DateTime.parse(a['date']);
+          DateTime dateB = DateTime.parse(b['date']);
+          return dateA.compareTo(dateB);
+        });
       });
     } catch (e) {
       // Handle error
@@ -158,69 +163,96 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
   }
 
   Widget _buildTransactionList() {
-    return Container(
-      decoration: const BoxDecoration(
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(16),
-          topRight: Radius.circular(16),
-        ),
-        color: Colors.white,
-      ),
-      height: MediaQuery.of(context).size.height -
-          (MediaQuery.of(context).size.width * 0.8),
-      child: ListView.builder(
-        
-        itemCount: transactions.isNotEmpty ? transactions.length : 0,
-        itemBuilder: (context, transactionIndex) {
-          var transaction = transactions[transactionIndex];
-          final transactionDate = DateTime.parse(transaction['date']);
-          String formattedDate = DateFormat('d MMM h:mm a').format(transactionDate);
-          var transactionCategory = transaction['category'];
-           
-          return Card(
-            elevation: 0,
-            color: Colors.grey[50],
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
-            margin: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-            child: ListTile(
-                leading: CircleAvatar(
-                child: Icon(categoryIcons[transactionCategory] ?? Icons.question_mark),
-                radius: 16,
-            ),
-              title: Text(
-                transaction['title'],
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                ),
-              ),
-              subtitle: Text(
-                transaction['note'],
-                style: TextStyle(fontSize: 14, color: Colors.grey),
-              ),
-              trailing: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    '\$${transaction['amount'].toStringAsFixed(2)}',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Text(
-                    formattedDate, // Provide the formatted date here
-                    style: TextStyle(fontSize: 12, color: Colors.grey),
-                  ),
-                ],
-              ),
-            ),
-          );
-        },
-      ),
-    );
+  // Calculate the start date of the selected time interval
+  DateTime startDate;
+  if (selectedTimeInterval == '1M') {
+    startDate = DateTime.now().subtract(Duration(days: 30));
+  } else if (selectedTimeInterval == '3M') {
+    startDate = DateTime.now().subtract(Duration(days: 90));
+  } else if (selectedTimeInterval == '6M') {
+    startDate = DateTime.now().subtract(Duration(days: 180));
+  } else if (selectedTimeInterval == '1Y') {
+    startDate = DateTime.now().subtract(Duration(days: 365));
+  }else if (selectedTimeInterval == '1W') {
+    startDate = DateTime.now().subtract(Duration(days: 7));
+  }else{
+    startDate = DateTime(1900);
   }
+
+  // Filter transactions based on the selected time interval
+  List<dynamic> filteredTransactions = transactions.where((transaction) {
+    DateTime transactionDate = DateTime.parse(transaction['date']);
+    return transactionDate.isAfter(startDate);
+  }).toList();
+
+  filteredTransactions=filteredTransactions.reversed.toList();
+
+
+  return Container(
+    decoration: const BoxDecoration(
+      borderRadius: BorderRadius.only(
+        topLeft: Radius.circular(16),
+        topRight: Radius.circular(16),
+      ),
+      color: Colors.white,
+    ),
+    height: MediaQuery.of(context).size.height -
+        (MediaQuery.of(context).size.width * 0.8),
+    child: ListView.builder(
+      itemCount: filteredTransactions.isNotEmpty ? filteredTransactions.length : 0,
+      itemBuilder: (context, transactionIndex) {
+        var transaction = filteredTransactions[transactionIndex];
+        final transactionDate = DateTime.parse(transaction['date']);
+        String formattedDate = DateFormat('d MMM h:mm a').format(transactionDate);
+        if (transactionDate.year != DateTime.now().year) {
+          formattedDate = DateFormat('d MMM y h:mm a').format(transactionDate);
+        }
+        var transactionCategory = transaction['category'];
+
+        return Card(
+          elevation: 0,
+          color: Colors.grey[50],
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          margin: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+          child: ListTile(
+            leading: CircleAvatar(
+              child: Icon(categoryIcons[transactionCategory] ?? Icons.question_mark),
+              radius: 16,
+            ),
+            title: Text(
+              transaction['title'],
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
+            ),
+            subtitle: Text(
+              transaction['note'],
+              style: TextStyle(fontSize: 14, color: Colors.grey),
+            ),
+            trailing: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  '\$${transaction['amount'].toStringAsFixed(2)}',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(
+                  formattedDate, // Provide the formatted date here
+                  style: TextStyle(fontSize: 12, color: Colors.grey),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    ),
+  );
+}
 }

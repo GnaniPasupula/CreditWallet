@@ -410,6 +410,7 @@ class _CreditCardScreenState extends State<CreditCardScreen> {
                   child: ListView.builder(
                     itemCount: creditCards.isNotEmpty ? creditCards[currentIndex].transactions.length : 0,
                     itemBuilder: (context, transactionIndex) {
+                      creditCards[currentIndex].transactions.sort((a, b) => b.date.compareTo(a.date));
                       final transaction = creditCards[currentIndex].transactions[transactionIndex];
                       final transactionCategory = transaction.category;
                       final now = DateTime.now();
@@ -427,12 +428,18 @@ class _CreditCardScreenState extends State<CreditCardScreen> {
                           transactionDate.day == now.day - 1) {
                         // Show "Yesterday" along with the time if it's yesterday
                         formattedDate = 'Yesterday ' + DateFormat.jm().format(transactionDate);
-                      } else {
-                        // Show date in the format "day Month" along with the time
+                      } else if (transactionDate.year == now.year) {
+                        // Show date in the format "day Month" along with the time if it's this year
                         formattedDate = DateFormat('d MMM').format(transactionDate) +
                             ' ' +
                             DateFormat.jm().format(transactionDate);
+                      } else {
+                        // Show date in the format "day Month Year" along with the time
+                        formattedDate = DateFormat('d MMM y').format(transactionDate) +
+                            ' ' +
+                            DateFormat.jm().format(transactionDate);
                       }
+
 
                         return Dismissible(
                             key: Key(transaction.date.toString()), // Use a unique identifier for each transaction
