@@ -19,7 +19,9 @@ class _CreditCardScreenState extends State<CreditCardScreen> {
   static const int _searchTabIndex = 0;
   static const int _analyticsTabIndex = 1;
 
-  int _currentIndex = _searchTabIndex; // Initial index
+  int _currentIndex = _searchTabIndex; 
+  bool isSearchExpanded = false;
+  String searchQuery = '';
 
 
 
@@ -45,7 +47,7 @@ class _CreditCardScreenState extends State<CreditCardScreen> {
    void onPageChanged(int newIndex) {
     setState(() {
       currentIndex = newIndex;
-      print('current index is $currentIndex');
+      // print('current index is $currentIndex');
     });
   }
 
@@ -372,12 +374,37 @@ class _CreditCardScreenState extends State<CreditCardScreen> {
                     children: [
                       Expanded(
                         child: Text(
-                          'Card Transactions', // Transaction text at top left
+                          !isSearchExpanded?'Card Transactions':'', // Transaction text at top left
                           style: TextStyle(
                             fontWeight: FontWeight.w600,
                             fontSize: 18,
                           ),
                         ),
+                      ),
+                      AnimatedContainer(
+                        duration: Duration(milliseconds: 300),
+                        width: isSearchExpanded ? 200 : 0,
+                        child: TextField(
+
+                          onChanged: (value) {
+                            setState(() {
+                              searchQuery = value;
+                            });
+                          },
+                          decoration: InputDecoration(
+                            hintText: 'Search transactions...',
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () {
+                          setState(() {
+                            isSearchExpanded = !isSearchExpanded;
+                          });
+                        },
+                        icon: Icon(Icons.search), // Search icon
+                        color: Colors.grey,
+                        iconSize: 24,
                       ),
                       IconButton(
                         onPressed: () async {
@@ -406,12 +433,26 @@ class _CreditCardScreenState extends State<CreditCardScreen> {
                     ],
                   ),
                 ),
+
                 Expanded(
+                  
                   child: ListView.builder(
+                    
                     itemCount: creditCards.isNotEmpty ? creditCards[currentIndex].transactions.length : 0,
                     itemBuilder: (context, transactionIndex) {
                       creditCards[currentIndex].transactions.sort((a, b) => b.date.compareTo(a.date));
-                      final transaction = creditCards[currentIndex].transactions[transactionIndex];
+
+                      List<Transaction> filteredTransactions = creditCards[currentIndex].transactions.where((transaction) {
+                      return transaction.title.toLowerCase().contains(searchQuery.toLowerCase()) ||
+                            transaction.category.toLowerCase().contains(searchQuery.toLowerCase()) ||
+                            transaction.note.toLowerCase().contains(searchQuery.toLowerCase());
+                      }).toList();
+
+                      if (transactionIndex >= filteredTransactions.length) {
+                        return null; 
+                      }
+                      
+                      final transaction = filteredTransactions[transactionIndex];
                       final transactionCategory = transaction.category;
                       final now = DateTime.now();
                       final transactionDate = transaction.date;
@@ -532,8 +573,8 @@ class _CreditCardScreenState extends State<CreditCardScreen> {
         ],
       ),
         Positioned(
-          left: MediaQuery.of(context).size.width / 2 - 64,
-          right: MediaQuery.of(context).size.width / 2 - 64,
+          left: MediaQuery.of(context).size.width / 2 - 40,
+          right: MediaQuery.of(context).size.width / 2 - 40,
           bottom: 16, // Adjust this value for the desired distance from the bottom
           child: Container(
             decoration: BoxDecoration(
@@ -543,16 +584,6 @@ class _CreditCardScreenState extends State<CreditCardScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                IconButton(
-                  onPressed: () {
-                    setState(() {
-                      _currentIndex = 0;
-                    });
-                  },
-                  icon: Icon(Icons.search_outlined),
-                  color: Color.fromARGB(255, 0, 0, 0),
-                  iconSize: 30,
-                ),
                 IconButton(
                   onPressed: () {
                     setState(() {
