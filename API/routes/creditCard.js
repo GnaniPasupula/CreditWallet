@@ -7,7 +7,7 @@ const app = express();
 app.use(bodyParser.json());
 // Add credit card
 router.post('/add', async (req, res) => {
-  const { cardNumber, limit, outStanding, expiryDate, cardName, bankName } = req.body;
+  const { cardNumber, limit, outStanding, expiryDate,dueDate, cardName, bankName } = req.body;
 
   const userId = req.user.userId; // Extracted from the JWT token
 
@@ -17,6 +17,7 @@ router.post('/add', async (req, res) => {
     limit,
     outStanding,
     expiryDate,
+    dueDate,
     cardName,
     bankName,
     user: userId,
@@ -49,7 +50,7 @@ router.get('/get', async (req, res) => {
 // Update credit card with cardNumber
 router.put('/update/:cardNumber', async (req, res) => {
   const { cardNumber } = req.params;
-  const { limit, outStanding, expiryDate, cardName, bankName } = req.body;
+  const { limit, outStanding, expiryDate,dueDate, cardName, bankName } = req.body;
   const userId = req.user.userId; // Extracted from the JWT token
 
   try {
@@ -59,6 +60,7 @@ router.put('/update/:cardNumber', async (req, res) => {
         limit,
         outStanding,
         expiryDate,
+        dueDate,
         cardName,
         bankName,
       },

@@ -3,6 +3,7 @@ class CreditCardData {
   final double limit;
   double outStanding;
   final String expiryDate;
+  final String dueDate;
   final String cardName;
   final String bankName;
   final List<Transaction> transactions;
@@ -12,6 +13,7 @@ class CreditCardData {
     required this.limit,
     required this.outStanding,
     required this.expiryDate,
+    required this.dueDate,
     required this.cardName,
     required this.bankName,
     required this.transactions,
@@ -34,6 +36,7 @@ class CreditCardData {
       limit: json['limit'].toDouble(),
       outStanding: json['outStanding'].toDouble(),
       expiryDate: json['expiryDate'],
+      dueDate: json['dueDate'],
       cardName: json['cardName'],
       bankName: json['bankName'],
       transactions: transactions,

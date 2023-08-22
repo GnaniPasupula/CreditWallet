@@ -68,6 +68,7 @@ static Future<CreditCardData?> updateCreditCard(
     double limit,
     double outStanding,
     String expiryDate,
+    String dueDate,
     String cardName,
     String bankName,
   ) async {
@@ -87,6 +88,7 @@ static Future<CreditCardData?> updateCreditCard(
           'limit': limit,
           'outStanding': outStanding,
           'expiryDate': expiryDate,
+          'dueDate': dueDate,
           'cardName': cardName,
           'bankName': bankName,
         }),
@@ -109,6 +111,7 @@ static Future<CreditCardData?> addCreditCard(
     double limit,
     double outStanding,
     String expiryDate,
+    String dueData,
     String cardName,
     String bankName,
   ) async {
@@ -131,6 +134,7 @@ static Future<CreditCardData?> addCreditCard(
           'limit': limit,
           'outStanding': outStanding,
           'expiryDate': expiryDate,
+          'dueDate': dueData,
           'cardName': cardName,
           'bankName': bankName,
         }),

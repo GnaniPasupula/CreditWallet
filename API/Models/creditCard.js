@@ -5,6 +5,7 @@ const creditCardSchema = new mongoose.Schema({
   limit: { type: Number, required: true },
   outStanding: { type: Number, required: true },
   expiryDate: { type: String, required: true },
+  dueDate: { type: String, required: true },
   cardName: { type: String, required: true },
   bankName: { type: String, required: true },
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },

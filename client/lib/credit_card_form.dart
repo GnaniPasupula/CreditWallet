@@ -28,6 +28,7 @@ class _CreditCardFormState extends State<CreditCardForm> {
   final TextEditingController _limitController = TextEditingController();
   final TextEditingController _outstandingController = TextEditingController();
   final TextEditingController _expiryDateController = TextEditingController();
+  final TextEditingController _dueDateController = TextEditingController();
   final TextEditingController _cardNameController = TextEditingController();
   final TextEditingController _bankNameController = TextEditingController();
 
@@ -49,6 +50,7 @@ class _CreditCardFormState extends State<CreditCardForm> {
       _limitController.text = creditCard.limit.toString();
       _outstandingController.text = creditCard.outStanding.toString();
       _expiryDateController.text = creditCard.expiryDate;
+      _dueDateController.text = creditCard.dueDate;
       _cardNameController.text = creditCard.cardName;
       _bankNameController.text = creditCard.bankName;
     }
@@ -60,6 +62,7 @@ class _CreditCardFormState extends State<CreditCardForm> {
     _limitController.dispose();
     _outstandingController.dispose();
     _expiryDateController.dispose();
+    _dueDateController.dispose();
     _cardNameController.dispose();
     _bankNameController.dispose();
     super.dispose();
@@ -71,6 +74,7 @@ class _CreditCardFormState extends State<CreditCardForm> {
       'limit': _limitController.text,
       'outStanding': _outstandingController.text,
       'expiryDate': _expiryDateController.text,
+      'dueDate': _dueDateController.text,
       'cardName': _cardNameController.text,
       'bankName': _bankNameController.text,
     };
@@ -82,6 +86,7 @@ class _CreditCardFormState extends State<CreditCardForm> {
           double.parse(formData['limit']!),
           double.parse(formData['outStanding']!),
           formData['expiryDate']!,
+          formData['dueDate']!,
           formData['cardName']!,
           formData['bankName']!,
         );
@@ -98,6 +103,7 @@ class _CreditCardFormState extends State<CreditCardForm> {
           double.parse(formData['limit']!),
           double.parse(formData['outStanding']!),
           formData['expiryDate']!,
+          formData['dueDate']!,
           formData['cardName']!,
           formData['bankName']!,
         );
@@ -144,6 +150,10 @@ class _CreditCardFormState extends State<CreditCardForm> {
                 TextFormField(
                   controller: _expiryDateController,
                   decoration: InputDecoration(labelText: 'Expiry Date'),
+                ),
+                TextFormField(
+                  controller: _dueDateController,
+                  decoration: InputDecoration(labelText: 'Due Date'),
                 ),
                 TextFormField(
                   controller: _cardNameController,
