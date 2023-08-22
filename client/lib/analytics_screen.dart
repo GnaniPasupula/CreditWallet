@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
@@ -12,8 +10,9 @@ class AnalyticsPage extends StatefulWidget {
 
 class _AnalyticsPageState extends State<AnalyticsPage> {
   List<dynamic> transactions = [];
+  List<dynamic> filteredTransactions = [];
   String selectedTimeInterval = 'All time';
-
+  List<FlSpot> lineChartSpots = [];
   
   final Map<String, IconData> categoryIcons = {
     'Fashion': Icons.shopping_bag_outlined,
@@ -30,7 +29,9 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
   @override
   void initState() {
     super.initState();
-    _fetchTransactions();
+    _fetchTransactions().then((_) {
+      _updateLineChartSpots();
+    });  
   }
 
   Future<void> _fetchTransactions() async {
@@ -47,6 +48,14 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
     } catch (e) {
       // Handle error
     }
+  }
+
+  void _updateLineChartSpots() {
+    lineChartSpots = transactions.asMap().entries.map((entry) {
+      int index = entry.key;
+      var transaction = entry.value;
+      return FlSpot(index.toDouble(), transaction['amount'].toDouble());
+    }).toList();
   }
 
   final List<Color> gradientColor = [
@@ -120,6 +129,37 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
       onPressed: () {
         setState(() {
           selectedTimeInterval = text;
+
+          // Calculate the start date of the selected time interval
+          DateTime startDate;
+          if (selectedTimeInterval == '1M') {
+            startDate = DateTime.now().subtract(Duration(days: 30));
+          } else if (selectedTimeInterval == '3M') {
+            startDate = DateTime.now().subtract(Duration(days: 90));
+          } else if (selectedTimeInterval == '6M') {
+            startDate = DateTime.now().subtract(Duration(days: 180));
+          } else if (selectedTimeInterval == '1Y') {
+            startDate = DateTime.now().subtract(Duration(days: 365));
+          } else if (selectedTimeInterval == '1W') {
+            startDate = DateTime.now().subtract(Duration(days: 7));
+          } else {
+            startDate = DateTime(1900);
+          }
+
+          // Filter transactions based on the selected time interval
+          filteredTransactions = transactions.where((transaction) {
+            DateTime transactionDate = DateTime.parse(transaction['date']);
+            return transactionDate.isAfter(startDate);
+          }).toList();
+
+          filteredTransactions = filteredTransactions.reversed.toList();
+
+          // Update the line chart spots
+          lineChartSpots = filteredTransactions.asMap().entries.map((entry) {
+            int index = entry.key;
+            var transaction = entry.value;
+            return FlSpot(filteredTransactions.length - 1 - index.toDouble(), transaction['amount'].toDouble());
+          }).toList();
         });
       },
       style: ElevatedButton.styleFrom(
@@ -132,12 +172,8 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
     );
   }
 
+
   Widget _buildLineChart() {
-    List<FlSpot> lineChartSpots = transactions.asMap().entries.map((entry) {
-      int index = entry.key;
-      var transaction = entry.value;
-      return FlSpot(index.toDouble(), transaction['amount'].toDouble());
-    }).toList();
 
     return Container(
       height: 300,
@@ -180,13 +216,12 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
   }
 
   // Filter transactions based on the selected time interval
-  List<dynamic> filteredTransactions = transactions.where((transaction) {
+  filteredTransactions = transactions.where((transaction) {
     DateTime transactionDate = DateTime.parse(transaction['date']);
     return transactionDate.isAfter(startDate);
   }).toList();
 
   filteredTransactions=filteredTransactions.reversed.toList();
-
 
   return Container(
     decoration: const BoxDecoration(
