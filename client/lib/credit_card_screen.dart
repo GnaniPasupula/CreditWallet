@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'package:client/spend_dialog.dart';
 import 'package:flutter/material.dart';
 import 'analytics_screen.dart';
@@ -5,6 +6,8 @@ import 'api_helper.dart';
 import 'credit_card_data.dart';
 import 'credit_card_form.dart'; 
 import 'package:intl/intl.dart';
+import 'package:flutter/services.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class CreditCardScreen extends StatefulWidget {
   @override
@@ -23,7 +26,7 @@ class _CreditCardScreenState extends State<CreditCardScreen> {
   bool isSearchExpanded = false;
   String searchQuery = '';
 
-
+  late final MethodChannel _methodChannel;
 
   final Map<String, IconData> categoryIcons = {
     'Fashion': Icons.shopping_bag_outlined,
@@ -40,8 +43,33 @@ class _CreditCardScreenState extends State<CreditCardScreen> {
   @override
   void initState() {
     super.initState();
+    _methodChannel = const MethodChannel('sms_receiver');
     _pageController = PageController(initialPage: currentIndex);
     _fetchCreditCardData();
+    _startSmsReceiver();
+    requestPermissions();
+  }
+
+  Future<void> _startSmsReceiver() async {
+    try {
+      final result = await _methodChannel.invokeMethod('startSmsReceiver');
+      print('startSmsReceiver result: $result');
+    } catch (e) {
+      print('Error invoking startSmsReceiver: $e');
+    }
+  }
+
+
+    // Inside your permission request function
+  Future<void> requestPermissions() async {
+    if (await Permission.sms.request().isGranted) {
+      // Permission granted, you can proceed
+      _startSmsReceiver();
+      log("Granted");
+    } else {
+      // Permission denied, handle accordingly
+      log("Denied");
+    }
   }
 
    void onPageChanged(int newIndex) {
@@ -62,6 +90,7 @@ class _CreditCardScreenState extends State<CreditCardScreen> {
       // Handle error and show a proper error message to the user
     }
   } 
+
 
   @override
   Widget build(BuildContext context) {
@@ -249,17 +278,17 @@ class _CreditCardScreenState extends State<CreditCardScreen> {
                     }          
                     Widget  getCardType(String cardNumber) {
                       if (cardNumber.startsWith('4')) {
-                        return Image.asset('../web/icons/visa.png', width: 28, height: 28); 
+                        return Image.asset('web/icons/visa.png', width: 28, height: 28); 
                       } else if (cardNumber.startsWith('5')) {
-                        return Image.asset('../web/icons/mastercard.png', width: 36, height: 36); 
+                        return Image.asset('web/icons/mastercard.png', width: 36, height: 36); 
                       } else if (cardNumber.startsWith('3')) {
-                        return Image.asset('../web/icons/amex.png', width: 36, height: 36); 
+                        return Image.asset('web/icons/amex.png', width: 36, height: 36); 
                       } else if (cardNumber.startsWith('6')) {
-                        return Image.asset('../web/icons/rupay.png', width: 36, height: 36);
+                        return Image.asset('web/icons/rupay.png', width: 36, height: 36);
                       } else {
-                        return Image.asset('../web/icons/mastercard.png', width: 36, height: 36); 
+                        return Image.asset('web/icons/mastercard.png', width: 36, height: 36); 
                       }
-                  }
+                    }
                     return Padding(
                       padding: EdgeInsets.symmetric(horizontal: 16),
                       child: Card(
@@ -302,12 +331,7 @@ class _CreditCardScreenState extends State<CreditCardScreen> {
                                       ],
                                     ),
                                     Spacer(),
-                                    // Text(
-                                    //   getCardType(card.cardNumber),
-                                    //   style: const TextStyle(
-                                    //     color: Colors.white,
-                                    //   ),
-                                    // ),
+                                 
                                     getCardType(card.cardNumber), // Display the card icon here
                                   ],
                                 ),                        
@@ -364,7 +388,7 @@ class _CreditCardScreenState extends State<CreditCardScreen> {
               ),
               color: Colors.white,
             ),
-            height: MediaQuery.of(context).size.height - ((MediaQuery.of(context).size.width * 0.8)), // Adjust the height as needed
+            height: MediaQuery.of(context).size.height - ((MediaQuery.of(context).size.width * 1)), // Adjust the height as needed
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -573,8 +597,8 @@ class _CreditCardScreenState extends State<CreditCardScreen> {
         ],
       ),
         Positioned(
-          left: MediaQuery.of(context).size.width / 2 - 40,
-          right: MediaQuery.of(context).size.width / 2 - 40,
+          left: MediaQuery.of(context).size.width / 2 - 48,
+          right: MediaQuery.of(context).size.width / 2 - 48,
           bottom: 16, // Adjust this value for the desired distance from the bottom
           child: Container(
             decoration: BoxDecoration(
@@ -584,6 +608,17 @@ class _CreditCardScreenState extends State<CreditCardScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
+                IconButton(
+                  onPressed: () {
+                    setState(() {
+                      _currentIndex = 0;
+                    });
+
+                  },
+                  icon: Icon(Icons.camera_alt_outlined),
+                  color: Color.fromARGB(255, 0, 0, 0),
+                  iconSize: 30,
+                ),
                 IconButton(
                   onPressed: () {
                     setState(() {
@@ -598,6 +633,7 @@ class _CreditCardScreenState extends State<CreditCardScreen> {
                   color: Color.fromARGB(255, 0, 0, 0),
                   iconSize: 30,
                 ),
+
               ],
             ),
           ),

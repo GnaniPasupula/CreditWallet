@@ -1,5 +1,3 @@
-import 'dart:html';
-
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
@@ -7,8 +5,8 @@ import 'dart:convert';
 import 'credit_card_data.dart';
 
 class ApiHelper {
-  static const baseUrl = 'http://localhost:3000';
-  //static const baseUrl = 'http://192.168.1.8:3000';
+  // static const baseUrl = 'http://localhost:3000';
+  static const baseUrl = 'http://192.168.1.8:3000';
   
   static Future<List<CreditCardData>> fetchCreditCardData() async {
     final url = '$baseUrl/creditCard/get';
