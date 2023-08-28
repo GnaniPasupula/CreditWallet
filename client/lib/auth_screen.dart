@@ -34,7 +34,7 @@ class _AuthScreenState extends State<AuthScreen> {
 
   Future<void> _signup() async {
     // const url = 'http://localhost:3000/auth/signup';
-    const url = 'http://192.168.1.8:3000/auth/signup';
+    const url = 'http://192.168.249.80:3000/auth/signup';
     final response = await http.post(
       Uri.parse(url),
       body: json.encode({
@@ -55,27 +55,33 @@ class _AuthScreenState extends State<AuthScreen> {
 
   Future<void> _signin() async {
     // final url = 'http://localhost:3000/auth/signin';
-    const url = 'http://192.168.1.8:3000/auth/signin';
-    final response = await http.post(
-      Uri.parse(url),
-      body: json.encode({
-        'email': _signInEmailController.text,
-        'password': _signInPasswordController.text,
-      }),
-      headers: {'Content-Type': 'application/json'},
-    );
+    const url = 'http://192.168.249.80:3000/auth/signin';
+    try {
+      final response = await http.post(
+        Uri.parse(url),
+        body: json.encode({
+          'email': _signInEmailController.text,
+          'password': _signInPasswordController.text,
+        }),
+        headers: {'Content-Type': 'application/json'},
+      );
 
     if (response.statusCode == 200) {
-      final responseData = json.decode(response.body);
-      final authToken = responseData['token'];
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('authToken', authToken);
-      Navigator.of(context).pushReplacementNamed('/credit_card_screen'); // Navigate to credit_card_screen.dart screen
-    } else {
-      final responseBody = json.decode(response.body);
-      final errorMessage = responseBody['message'];
-      _showErrorDialog(errorMessage);
-    }
+          final responseData = json.decode(response.body);
+          final authToken = responseData['token'];
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setString('authToken', authToken);
+          Navigator.of(context).pushReplacementNamed('/credit_card_screen'); // Navigate to credit_card_screen.dart screen
+        } else {
+          final responseBody = json.decode(response.body);
+          final errorMessage = responseBody['message'];
+          _showErrorDialog(errorMessage);
+        }
+    
+    } 
+    catch (error) {
+      print('Error during HTTP request: $error');
+    }  
   }
 
   void _showSuccessDialog(String message) {
