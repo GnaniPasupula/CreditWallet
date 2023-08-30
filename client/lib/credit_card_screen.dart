@@ -91,12 +91,45 @@ class _CreditCardScreenState extends State<CreditCardScreen> {
     }
   } 
 
+  Future<bool> showConfirmationDialog(BuildContext context) async {
+    return await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Confirm Deletion"),
+          content: Text("Are you sure you want to delete this credit card?"),
+          actions: <Widget>[
+            TextButton(
+              child: Text("No"),
+              onPressed: () {
+                Navigator.of(context).pop(false); // Close the dialog and return false
+              },
+            ),
+            TextButton(
+              child: Text("Yes"),
+              onPressed: () {
+                Navigator.of(context).pop(true); // Close the dialog and return true
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
+        leading: IconButton(
+          onPressed: () {
+              // Handle notification icon press
+          },
+          icon: Icon(Icons.notifications),
+        ),
         title: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -107,14 +140,14 @@ class _CreditCardScreenState extends State<CreditCardScreen> {
           ],
         ),
         backgroundColor: Colors.black,
-        automaticallyImplyLeading: false,
         actions: [
           IconButton(
             onPressed: () {
               // Handle notification icon press
             },
-            icon: Icon(Icons.notifications),
+            icon: Icon(Icons.logout_outlined),
           ),
+          
         ],
       ),
       body: Stack ( children:[ Column(
@@ -201,17 +234,20 @@ class _CreditCardScreenState extends State<CreditCardScreen> {
                 Expanded(
                   child: ElevatedButton(
                     onPressed: () async {
-                      // Add your delete button functionality here
-                      final deletedCard = await ApiHelper.deleteCreditCard(creditCards[currentIndex].cardNumber);
-                      if (deletedCard != null) {
-                        setState(() {
-                          creditCards.removeAt(currentIndex);
-                          if (currentIndex == creditCards.length) {
-                            currentIndex--;
-                          }
-                        });
+                      // Show confirmation dialog
+                      bool confirmed = await showConfirmationDialog(context);
+                      if (confirmed) {
+                        // Delete the credit card
+                        final deletedCard = await ApiHelper.deleteCreditCard(creditCards[currentIndex].cardNumber);
+                        if (deletedCard != null) {
+                          setState(() {
+                            creditCards.removeAt(currentIndex);
+                            if (currentIndex == creditCards.length) {
+                              currentIndex--;
+                            }
+                          });
+                        }
                       }
-
                     },
                     style: ElevatedButton.styleFrom(
                       primary: Colors.white,
@@ -363,11 +399,19 @@ class _CreditCardScreenState extends State<CreditCardScreen> {
                                   ),
                                   const Spacer(),
                                   Text(
-                                    'Balance:\$${card.limit-card.outStanding}',
+                                    'Balance:',
                                     style: TextStyle(
                                       color: Colors.white,
                                     ),
-                                  )
+                                  ),
+                                  Text(
+                                    '\$${(card.limit - card.outStanding).toStringAsFixed(2)}',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
                                 ],
                               )                       
                             ],

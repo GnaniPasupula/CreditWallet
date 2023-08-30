@@ -118,8 +118,8 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
         _buildTimeFilterButton('1Y'),
         _buildTimeFilterButton('6M'),
         _buildTimeFilterButton('3M'),
-        _buildTimeFilterButton('1M'),
-        _buildTimeFilterButton('1W'),
+        // _buildTimeFilterButton('1M'),
+        // _buildTimeFilterButton('1W'),
       ],
     );
   }
